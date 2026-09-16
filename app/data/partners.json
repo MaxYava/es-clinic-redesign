@@ -1,0 +1,69 @@
+[
+  {
+    "name": "K+31",
+    "asset": "k31.svg",
+    "source_path": "/K+31/logo-light.svg"
+  },
+  {
+    "name": "Hadassah",
+    "asset": "hadassah.svg",
+    "source_path": "/Hadassah/logo-1.svg"
+  },
+  {
+    "name": "Docdeti",
+    "asset": "docdeti.svg",
+    "source_path": "/Docdeti/docdeti_logo.svg"
+  },
+  {
+    "name": "ЕМС",
+    "asset": "emc.png",
+    "source_path": "/ЕМС/LOGO.pdf"
+  },
+  {
+    "name": "GMS",
+    "asset": "gms.png",
+    "source_path": "/GMS/GMS-LogoBlue_new.ai"
+  },
+  {
+    "name": "Коммунарка",
+    "asset": "kommunarka.svg",
+    "source_path": "/Коммунарка/logo.svg"
+  },
+  {
+    "name": "Мать и дитя",
+    "asset": "mother-child.svg",
+    "source_path": "/Мать и дитя/MD Group_logo_w4_cvet-01.svg"
+  },
+  {
+    "name": "Клиника Фомина",
+    "asset": "fomina.svg",
+    "source_path": "/Клиника Фомина/Цвет.svg"
+  },
+  {
+    "name": "Сеченовский Университет",
+    "asset": "sechenov.svg",
+    "source_path": "/Сеченев/Sechenov Logo color horizontal.svg"
+  },
+  {
+    "name": "Три сестры",
+    "asset": "three-sisters.webp",
+    "source_path": "/Три сестры/download.png",
+    "processing": "Single logo cropped from supplied sprite: 913,0,1270,306"
+  },
+  {
+    "name": "Чайка",
+    "asset": "chaika.svg",
+    "source_path": "/Чайка/Chaika clinics horizontal.svg"
+  },
+  {
+    "name": "ФГБУ НМИЦК Чазова",
+    "asset": "chazov.webp",
+    "source_path": "/ФГБУ НМИЦК Чазова/cardiology_logo_CHazova.png"
+  },
+  {
+    "name": "Морозовская детская больница",
+    "asset": "morozov.webp",
+    "source_path": "/Морозовская/Финальные файлы по задаче 1/Финальные файлы по задаче 1.pdf",
+    "processing": "Page 1: cropped logo, excluding signage dimensions"
+  }
+]

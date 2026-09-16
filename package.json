@@ -1,0 +1,22 @@
+{
+  "name": "es-clinic-next-editor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 5175",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 4175",
+    "prepare:assets": "node scripts/prepare-assets.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0"
+  }
+}
