@@ -1,14 +1,16 @@
 import Image from "next/image";
+import { RebuiltHero } from "./ui/rebuilt-hero";
 import copy from "./data/copy.json";
 import faqs from "./data/faqs.json";
 import partners from "./data/partners.json";
+import { photoSource } from './data/photo-sources';
 import {
   EditorProvider,
   Editable,
   EditablePhoto,
   EditorLauncher,
 } from "./ui/editor";
-import { VideoCard, ContactButton } from "./ui/interactive";
+import { VideoCard, ContactButton, SiteHeader, ProcessStep } from "./ui/interactive";
 
 const Text = ({ n, as = "p", className = "" }) => (
   <Editable id={`copy-${n}`} as={as} className={className}>
@@ -18,7 +20,7 @@ const Text = ({ n, as = "p", className = "" }) => (
 const Photo = ({ name, alt, className = "" }) => (
   <EditablePhoto
     id={`photo-${name}`}
-    src={`/assets/${name}.webp`}
+    src={photoSource(name)}
     alt={alt}
     className={className}
   />
@@ -60,59 +62,40 @@ const doctors = [
   { image: "frolov", name: 56, url: "https://es-clinic.ru/doctor-frolov" },
   { image: "utin", name: 57, role: 58, url: "https://es-clinic.ru/vrachi" },
 ];
+const partnerLogoIndex = {
+  "Мать и дитя": 0, "Чайка": 1, "Клиника Фомина": 2, "K+31": 3,
+  "Docdeti": 4, "ФГБУ НМИЦК Чазова": 5, "Сеченовский Университет": 6,
+  "Морозовская детская больница": 7, "Коммунарка": 8, "Три сестры": 9,
+  "ЕМС": 10, "GMS": 11, "Hadassah": 12,
+};
 
 export default function Home() {
+  const rebuilt = true;
   return (
     <EditorProvider>
       <a className="skip" href="#approach">
         Перейти к содержимому
       </a>
-      <header className="header">
-        <a href="#home" aria-label="ЕС Клиника — на главную" className="brand">
-          <Mark />
-          <Image
-            src="/assets/logo.svg"
-            width={184}
-            height={28}
-            alt="ЕС Клиника"
-          />
-        </a>
-        <nav aria-label="Основная навигация">
-          <a href="#approach">Наш подход</a>
-          <a href="#team">Врачи</a>
-          <a href="#contract">Сопровождение</a>
-          <a href="#contacts">Контакты</a>
-        </nav>
-        <a className="phone" href="tel:+74958681857">
-          +7 (495) 868-18-57
-        </a>
-        <details className="mobile-menu">
-          <summary aria-label="Открыть меню">☰</summary>
-          <nav>
-            <a href="#approach">Наш подход</a>
-            <a href="#team">Врачи</a>
-            <a href="#contract">Сопровождение</a>
-            <a href="#contacts">Контакты</a>
-          </nav>
-        </details>
-      </header>
+      {!rebuilt && <SiteHeader />}
       <main id="home">
-        <section
+        {rebuilt ? <RebuiltHero /> : <section
           className="hero"
           aria-label="ЕС Клиника — Медицинский Family Office"
         >
           <EditablePhoto
-            id="photo-hero"
-            src="/assets/hero.webp"
-            alt="Семья на консультации в ЕС Клинике"
+            id="photo-hero-official"
+            src="/assets/official-hero.png"
+            alt="Бородатый врач консультирует семью в ЕС Клинике"
             className="hero-photo"
             priority
           />
+          <div className="hero-deco" aria-hidden="true"><Image src="/assets/official-hero-deco.svg" fill alt="" /></div>
+          <div className="hero-mobile-clover" aria-hidden="true"><Mark /></div>
           <div className="hero-content">
-            <Text n={1} className="hero-eyebrow" />
+            <Editable id="hero-official-eyebrow" className="hero-eyebrow">{"Медицинский\nFamily Office"}</Editable>
             <h1>
               <Image
-                src="/assets/logo.svg"
+                src="/assets/official-hero-logo.svg"
                 alt="ЕС Клиника"
                 width={815}
                 height={94}
@@ -121,23 +104,24 @@ export default function Home() {
               />
             </h1>
             <div className="hero-tagrow">
-              <div>
-                <Text n={2} />
-                <Text n={3} />
+              <div className="hero-tagline">
+                <Editable id="hero-official-line-1">Системное управление здоровьем семьи.</Editable>
+                <Editable id="hero-official-line-2">Непрерывно. Проактивно. Конфиденциально</Editable>
               </div>
-              <ContactButton label={copy[6]} />
+              <ContactButton label={copy[6]} hero />
             </div>
           </div>
           <div className="hero-card">
             <div className="avatars">
-              {["tishina", "frolov", "sorokin", "maksakov"].map((d) => (
+              {["tishina", "frolov", "utin", "sorokin", "maksakov"].map((d) => (
                 <a
                   key={d}
                   href="#team"
                   aria-label="Перейти к медицинской команде"
                 >
                   <Image
-                    src={`/assets/${d}.webp`}
+                    src={`/assets/official-avatar-${d}.${d === "utin" ? "jpg" : "png"}`}
+                    unoptimized
                     width={54}
                     height={54}
                     alt=""
@@ -145,12 +129,12 @@ export default function Home() {
                 </a>
               ))}
               <a href="#team" aria-label="Вся команда">
-                ↗
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </a>
             </div>
             <Text n={5} />
           </div>
-        </section>
+        </section>}
         <nav className="section-nav" aria-label="Разделы страницы">
           {[
             ["Наш подход", "approach", "✣"],
@@ -206,22 +190,25 @@ export default function Home() {
             <Text n={18} as="h2" />
             <Mark />
           </div>
-          <div className="timeline">
-            {stages.map(([title, body]) => (
-              <article className="stage" key={title}>
-                <div>
-                  <Text n={title} as="h3" />
-                  {body ? (
-                    <Text n={body} />
-                  ) : (
-                    <a className="text-link" href="#contract">
-                      Что входит в годовой контракт ↗
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
+          <ol className="process-list">
+            {stages.map(([title, body], index) => {
+              const heading = (
+                <>
+                  <span className="process-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <Editable id={`copy-${title}`} as="h3">{copy[title].replace(/^\d+\s+/, "")}</Editable>
+                </>
+              );
+              return (
+                <li key={title}>
+                  <ProcessStep heading={heading}>
+                    {body ? <Text n={body} /> : (
+                      <Editable id="process-contract-description" as="p">Обсуждаем потребности вашей семьи и условия годового сопровождения. Заключаем контракт — с этого начинается работа вашей постоянной медицинской команды.</Editable>
+                    )}
+                  </ProcessStep>
+                </li>
+              );
+            })}
+          </ol>
         </section>
         <section className="section comparison" id="comparison">
           <Text n={36} as="h2" />
@@ -272,13 +259,7 @@ export default function Home() {
           <Text n={60} as="h2" />
           <Text n={61} className="lead" />
           {groups.map((group) => (
-            <details key={group.title} open>
-              <summary>
-                <Text n={group.title} as="span" />
-                <span className="plus" aria-hidden="true">
-                  +
-                </span>
-              </summary>
+            <ProcessStep key={group.title} variant="contract" heading={<Text n={group.title} as="span" />}>
               <div className="services">
                 {group.items.map((ids) => (
                   <article key={ids[0]}>
@@ -295,7 +276,7 @@ export default function Home() {
                   </article>
                 ))}
               </div>
-            </details>
+            </ProcessStep>
           ))}
         </section>
         <section className="section partners" id="partners">
@@ -304,7 +285,7 @@ export default function Home() {
             {partners.map((p) => (
               <div key={p.asset}>
                 <Image
-                  src={`/assets/partners/${p.asset}`}
+                  src={`/assets/partners-mono/partner-${partnerLogoIndex[p.name]}.webp`}
                   width={180}
                   height={80}
                   sizes="(max-width: 600px) 40vw, 180px"
@@ -335,7 +316,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <Photo name="history" alt="Врач ЕС Клиники" />
+          <Photo name="history" alt="Фасад ЕС Клиники с надписью «Основана в 2006»" />
         </section>
         <section className="loyalty">
           <Photo name="loyalty" alt="Семья — несколько поколений вместе" />
@@ -353,37 +334,28 @@ export default function Home() {
             </div>
             <blockquote>
               <Text n={95} className="lead" />
-              <details>
-                <summary>
-                  Читать отзыв полностью <span aria-hidden="true">+</span>
-                </summary>
+              <ProcessStep variant="review" heading="Читать отзыв полностью">
                 {[96, 97, 98].map((n) => (
                   <Text n={n} key={n} />
                 ))}
-              </details>
+              </ProcessStep>
             </blockquote>
           </div>
         </section>
         <section className="section faq" id="faq">
           <Text n={99} as="h2" />
           {faqs.map((faq, i) => (
-            <details key={i}>
-              <summary>
+            <ProcessStep key={i} variant="faq" heading={
                 <Editable id={`faq-${i}-question`} as="span">
                   {faq.question}
                 </Editable>
-                <span className="plus" aria-hidden="true">
-                  +
-                </span>
-              </summary>
-              <div>
+            }>
                 {faq.paragraphs.map((p, j) => (
                   <Editable id={`faq-${i}-${j}`} key={j}>
                     {p}
                   </Editable>
                 ))}
-              </div>
-            </details>
+            </ProcessStep>
           ))}
         </section>
         <section className="section split final-cta" id="consultation">
@@ -394,7 +366,7 @@ export default function Home() {
             <Text n={104} />
             <ContactButton label={copy[105]} />
           </div>
-          <Photo name="clinic" alt="Гостиная в ЕС Клинике" />
+          <Photo name="clinic" alt="Стойка ресепшена и партнёры ЕС Клиники" />
         </section>
       </main>
       <footer id="contacts">
@@ -435,13 +407,6 @@ export default function Home() {
           Имеются противопоказания. Необходима консультация специалиста.
         </p>
       </footer>
-      <a
-        className="floating-contact"
-        href="tel:+74958681857"
-        aria-label="Позвонить в клинику"
-      >
-        ☎
-      </a>
       <EditorLauncher />
     </EditorProvider>
   );

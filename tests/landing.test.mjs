@@ -57,8 +57,14 @@ test(
         await page.locator('#system [data-edit-id="copy-16"]').count(),
         0,
       );
-      for (const section of await page.locator("main>section").all())
+      for (const section of await page.locator("main>section").all()) {
         await section.scrollIntoViewIfNeeded();
+        for (const img of await section.locator("img").all()) {
+          if (!await img.isVisible()) continue;
+          await img.scrollIntoViewIfNeeded();
+          await img.evaluate(image => image.decode());
+        }
+      }
       await page.waitForLoadState("networkidle");
       const broken = await page
         .locator("img")

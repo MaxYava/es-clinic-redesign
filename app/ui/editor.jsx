@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { photoSource } from '../data/photo-sources';
 const Context = createContext(null);
 const STORAGE = "es-clinic-next-document-v1";
 const gallery = [
@@ -47,8 +48,8 @@ function validate(data) {
     if (item.layout && typeof item.layout === "object") {
       clean.layout = {};
       for (const [key, min, max] of [
-        ["x", -2000, 2000],
-        ["y", -2000, 2000],
+        ["x", -50000, 50000],
+        ["y", -50000, 50000],
         ["scale", 10, 300],
         ["width", 10, 2400],
         ["height", 10, 2400],
@@ -78,7 +79,7 @@ function validate(data) {
         if (typeof value !== "string") continue;
         if (
           key === "fontSize" &&
-          !/^(?:[8-9]|[1-9]\d|1[0-5]\d|160)px$/.test(value)
+          (!/^\d+(?:\.\d+)?px$/.test(value) || parseFloat(value) < 8 || parseFloat(value) > 160)
         )
           continue;
         if (key === "width" && !/^(?:[1-9]|[1-9]\d|100)%$/.test(value))
@@ -112,6 +113,7 @@ export function EditorProvider({ children }) {
   const [picking, setPicking] = useState(false);
   const [selected, setSelected] = useState(null);
   const [message, setMessage] = useState("");
+  const [metrics, setMetrics] = useState(null);
   const registry = useRef(new Map());
   const pageRef = useRef(null);
   // Stable structural paths, independent of text edits and image replacements.
@@ -220,6 +222,59 @@ export function EditorProvider({ children }) {
   const original = registry.current.get(selected);
   const current = changes[selected] || {};
   const layout = current.layout || {};
+  const selectedNode = () => pageRef.current?.querySelector(`[data-layout-id="${selected}"]`);
+  const measure = () => {
+    const node = selectedNode();
+    if (!node) return null;
+    const rect = node.getBoundingClientRect();
+    let parentScale = 1;
+    for (let parent = node.parentElement; parent; parent = parent.parentElement) {
+      const scale = parseFloat(getComputedStyle(parent).scale);
+      if (Number.isFinite(scale)) parentScale *= scale;
+    }
+    const css = getComputedStyle(node);
+    const ownScale = parseFloat(css.scale);
+    const totalScale = parentScale * (Number.isFinite(ownScale) ? ownScale : 1);
+    const text = original?.type === 'text' || (original?.type === 'element' &&
+      !!node.textContent.trim() && !node.querySelector('img,svg,video,button,a,p,h1,h2,h3,h4,details'));
+    return { x: rect.left + window.scrollX, y: rect.top + window.scrollY,
+      fontSize: parseFloat(css.fontSize) * totalScale, parentScale, totalScale, text };
+  };
+  useLayoutEffect(() => {
+    if (!open || !selected) return;
+    let frame;
+    const refresh = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const next = measure();
+        setMetrics(prev => JSON.stringify(prev) === JSON.stringify(next) ? prev : next);
+      });
+    };
+    refresh();
+    const observer = new ResizeObserver(refresh);
+    observer.observe(pageRef.current);
+    const node = selectedNode();
+    if (node) observer.observe(node);
+    window.addEventListener('resize', refresh);
+    window.addEventListener('scroll', refresh, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener('resize', refresh);
+      window.removeEventListener('scroll', refresh);
+    };
+  }, [open, selected, changes]);
+  const setCoordinate = (key, value) => {
+    const live = measure();
+    if (!live || value === '' || !Number.isFinite(Number(value))) return;
+    setLayout({ [key]: Math.max(-50000, Math.min(50000,
+      (layout[key] || 0) + (Number(value) - live[key]) / live.parentScale)) });
+  };
+  const setTextSize = (value) => {
+    const live = measure();
+    if (!live) return;
+    style('fontSize', value === '' ? '' : `${Math.max(8, Math.min(160, Number(value) / live.totalScale))}px`);
+  };
   const setLayout = (patch) =>
     setChanges((prev) => ({
       ...prev,
@@ -234,10 +289,10 @@ export function EditorProvider({ children }) {
       ?.querySelector(`[data-layout-id="${selected}"]`)
       ?.parentElement?.closest("[data-layout-id]");
   const layoutCss = Object.entries(changes)
-    .filter(([, value]) => value.layout)
+    .filter(([, value]) => value.layout || value.style?.fontSize)
     .map(([id, value]) => {
       const l = value.layout;
-      return `[data-layout-id="${id}"]{translate:${l.x || 0}px ${l.y || 0}px;scale:${(l.scale ?? 100) / 100};${l.width ? `width:${l.width}px!important;max-width:none!important;` : ""}${l.height ? `height:${l.height}px!important;min-height:0!important;` : ""}}[data-layout-id="${id}"][data-layout-inline]{display:inline-block;}`;
+      return `[data-layout-id="${id}"]{${l ? `translate:${l.x || 0}px ${l.y || 0}px;scale:${(l.scale ?? 100) / 100};${l.width ? `width:${l.width}px!important;max-width:none!important;` : ""}${l.height ? `height:${l.height}px!important;min-height:0!important;` : ""}` : ''}${value.style?.fontSize ? `font-size:${value.style.fontSize}!important;` : ''}}[data-layout-id="${id}"][data-layout-inline]{display:inline-block;}`;
     })
     .join("\n");
   const exportDraft = () => {
@@ -354,30 +409,23 @@ export function EditorProvider({ children }) {
               <fieldset className="layout-fields">
                 <legend>Положение и размер</legend>
                 <p className="editor-note">
-                  Сдвиг относительно исходного места. Соседние блоки не
-                  перестраиваются. Масштаб меняет весь элемент, включая иконки.
+                  Координаты левого верхнего угла элемента от левого верхнего
+                  угла всей страницы (0, 0), независимо от прокрутки.
+                  Перемещение не перестраивает соседние блоки.
                 </p>
                 <div className="editor-pair">
                   {[
-                    ["x", "По горизонтали, px"],
-                    ["y", "По вертикали, px"],
+                    ["x", "От левого края страницы, px"],
+                    ["y", "От верха страницы, px"],
                   ].map(([key, label]) => (
                     <label key={key}>
                       {label}
                       <input
                         aria-label={label}
                         type="number"
-                        min="-2000"
-                        max="2000"
-                        value={layout[key] || 0}
-                        onChange={(e) =>
-                          setLayout({
-                            [key]: Math.max(
-                              -2000,
-                              Math.min(2000, Number(e.target.value)),
-                            ),
-                          })
-                        }
+                        step="1"
+                        value={metrics ? Math.round(metrics[key] * 100) / 100 : ''}
+                        onChange={(e) => setCoordinate(key, e.target.value)}
                       />
                     </label>
                   ))}
@@ -396,8 +444,8 @@ export function EditorProvider({ children }) {
                       onClick={() =>
                         setLayout({
                           [key]: Math.max(
-                            -2000,
-                            Math.min(2000, (layout[key] || 0) + delta),
+                            -50000,
+                            Math.min(50000, (layout[key] || 0) + delta / (metrics?.parentScale || 1)),
                           ),
                         })
                       }
@@ -406,7 +454,12 @@ export function EditorProvider({ children }) {
                     </button>
                   ))}
                 </div>
-                <label>
+                {metrics?.text ? <label>
+                  Размер текста, px
+                  <input aria-label="Размер текста, px" type="number" min="8" max="160" step="1"
+                    value={Math.round(metrics.fontSize * 100) / 100}
+                    onChange={e => setTextSize(e.target.value)} />
+                </label> : <label>
                   Масштаб, %
                   <input
                     aria-label="Масштаб, %"
@@ -423,7 +476,7 @@ export function EditorProvider({ children }) {
                       })
                     }
                   />
-                </label>
+                </label>}
                 <div className="editor-pair">
                   {[
                     ["width", "Ширина, px"],
@@ -491,15 +544,8 @@ export function EditorProvider({ children }) {
                         min="8"
                         max="160"
                         placeholder="Исходный"
-                        value={current.style?.fontSize?.replace("px", "") || ""}
-                        onChange={(e) =>
-                          style(
-                            "fontSize",
-                            e.target.value
-                              ? `${Math.max(8, Math.min(160, Number(e.target.value)))}px`
-                              : "",
-                          )
-                        }
+                        value={metrics ? Math.round(metrics.fontSize * 100) / 100 : ''}
+                        onChange={(e) => setTextSize(e.target.value)}
                       />
                     </label>
                     <label>
@@ -573,14 +619,14 @@ export function EditorProvider({ children }) {
                         Другая фотография
                       </option>
                       {gallery.map((n) => (
-                        <option key={n} value={`/assets/${n}.webp`}>
+                        <option key={n} value={photoSource(n)}>
                           {
                             {
                               hero: "Первый экран",
                               family: "Бабушка с внуком",
                               reception: "Ресепшен",
                               clinic: "Интерьер",
-                              history: "Врач",
+                              history: "Фасад клиники",
                               loyalty: "Семья",
                               tishina: "Дарья Тишина",
                               frolov: "Павел Фролов",
@@ -769,8 +815,9 @@ export function EditablePhoto({
         fill
         sizes={priority ? "100vw" : "(max-width: 760px) 100vw, 50vw"}
         preload={priority}
+        quality={90}
         loading={priority ? undefined : "lazy"}
-        unoptimized={custom}
+        unoptimized={custom || finalSrc.startsWith('/assets/doctors-original/') || finalSrc === '/assets/official-hero.png'}
       />
     </div>
   );
