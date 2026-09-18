@@ -18,6 +18,7 @@ const gallery = [
 ];
 const fonts = {
   Исходный: "",
+  Germes: "var(--font-germes), Arial, sans-serif",
   Aeroport: "var(--font-aeroport), Arial, sans-serif",
   "Times New Roman": '"Times New Roman", serif',
   Georgia: "Georgia, serif",
@@ -130,7 +131,10 @@ export function EditorProvider({ children }) {
         )
           return;
         if (!element.matches("main,section,header,footer")) {
-          const id = element.dataset.editId || `node${key}`;
+          // Rebuilt hero nodes must not inherit structural patches from older markup.
+          // Keep the remaining page paths unchanged, preserving all lower-section drafts.
+          const scope = element.closest("[data-layout-scope]")?.dataset.layoutScope;
+          const id = element.dataset.editId || element.dataset.layoutId || `${scope || "node"}${key}`;
           element.dataset.layoutId = id;
           if (getComputedStyle(element).display === "inline")
             element.dataset.layoutInline = "true";
@@ -238,6 +242,7 @@ export function EditorProvider({ children }) {
     const text = original?.type === 'text' || (original?.type === 'element' &&
       !!node.textContent.trim() && !node.querySelector('img,svg,video,button,a,p,h1,h2,h3,h4,details'));
     return { x: rect.left + window.scrollX, y: rect.top + window.scrollY,
+      width: rect.width / totalScale, height: rect.height / totalScale,
       fontSize: parseFloat(css.fontSize) * totalScale, parentScale, totalScale, text };
   };
   useLayoutEffect(() => {
@@ -351,7 +356,7 @@ export function EditorProvider({ children }) {
       {open && selected && (
         <style>{`[data-layout-id="${selected}"]{outline:2px solid #b4773a;outline-offset:4px;}`}</style>
       )}
-      <div ref={pageRef} className={picking ? "page picking" : "page"}>
+      <div ref={pageRef} className={picking ? "page picking" : "page"} data-editing={open || picking}>
         {children}
       </div>
       {picking && (
@@ -489,8 +494,8 @@ export function EditorProvider({ children }) {
                         type="number"
                         min="10"
                         max="2400"
-                        placeholder="Авто"
-                        value={layout[key] ?? ""}
+                        step="1"
+                        value={layout[key] ?? (metrics ? Math.round(metrics[key] * 100) / 100 : "")}
                         onChange={(e) =>
                           setLayout({
                             [key]:

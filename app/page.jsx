@@ -1,5 +1,7 @@
 import Image from "next/image";
+import { ScrollEffects } from "./ui/scroll-effects";
 import { RebuiltHero } from "./ui/rebuilt-hero";
+import { ContactWidget } from "./ui/contact-widget";
 import copy from "./data/copy.json";
 import faqs from "./data/faqs.json";
 import partners from "./data/partners.json";
@@ -80,7 +82,7 @@ export default function Home() {
       <main id="home">
         {rebuilt ? <RebuiltHero /> : <section
           className="hero"
-          aria-label="ЕС Клиника — Медицинский Family Office"
+          aria-label="ЕС Клиника – Медицинский Family Office"
         >
           <EditablePhoto
             id="photo-hero-official"
@@ -137,15 +139,14 @@ export default function Home() {
         </section>}
         <nav className="section-nav" aria-label="Разделы страницы">
           {[
-            ["Наш подход", "approach", "✣"],
-            ["Как это работает", "process", "◎"],
-            ["Наши врачи", "team", "♧"],
-            ["Годовой контракт", "contract", "≡"],
-            ["История", "history", "◷"],
-            ["Вопросы и ответы", "faq", "?"],
-          ].map(([label, id, icon]) => (
-            <a key={id} href={`#${id}`}>
-              <span aria-hidden="true">{icon}</span>
+            ["Medical Family Office", "#approach", "medical-family-office"],
+            ["Ценности", "#responsibility", "values"],
+            ["Наши врачи", "#team", "doctors"],
+            ["История", "#history", "history"],
+            ["Контакты", "#contacts", "contacts"],
+          ].map(([label, href, icon]) => (
+            <a key={icon} href={href} {...(href.startsWith("https:") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+              <span className="section-nav-icon" aria-hidden="true"><Image src={`/assets/section-icons/${icon}.png`} width={48} height={48} alt="" unoptimized /></span>
               {label}
             </a>
           ))}
@@ -153,8 +154,10 @@ export default function Home() {
 
         <section className="section split intro" id="approach">
           <div>
-            <Mark />
-            <Text n={8} as="h2" />
+            <div className="intro-title">
+              <Mark />
+              <Text n={8} as="h2" />
+            </div>
             <Text n={9} className="lead" />
             <Text n={10} />
             <div className="capacity">
@@ -167,16 +170,20 @@ export default function Home() {
         <section className="section split system" id="system">
           <Photo name="family" alt="Бабушка целует внука" />
           <div>
-            <Mark />
-            <Text n={13} as="h2" />
+            <div className="intro-title">
+              <Mark />
+              <Text n={13} as="h2" />
+            </div>
             <Text n={14} className="lead" />
             <Text n={15} />
           </div>
         </section>
         <section className="section split responsibility" id="responsibility">
           <div>
-            <Mark />
-            <Text n={16} className="statement" />
+            <div className="responsibility-statement">
+              <Mark />
+              <Text n={16} className="statement" />
+            </div>
             <Text n={17} className="lead" />
           </div>
           <Photo
@@ -202,16 +209,26 @@ export default function Home() {
                 <li key={title}>
                   <ProcessStep heading={heading}>
                     {body ? <Text n={body} /> : (
-                      <Editable id="process-contract-description" as="p">Обсуждаем потребности вашей семьи и условия годового сопровождения. Заключаем контракт — с этого начинается работа вашей постоянной медицинской команды.</Editable>
+                      <Editable id="process-contract-description" as="p">Обсуждаем потребности вашей семьи и условия годового сопровождения. Заключаем контракт – с этого начинается работа вашей постоянной медицинской команды.</Editable>
                     )}
                   </ProcessStep>
                 </li>
               );
             })}
           </ol>
+          <a
+            className="process-more"
+            href="https://es-clinic.ru/medicalfamilyoffice"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Text n={36} as="span" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 18 18 6M6 6h12v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
         </section>
-        <section className="section comparison" id="comparison">
-          <Text n={36} as="h2" />
+        <section className="section comparison" id="comparison" aria-label="Сравнение сопровождения с ЕС Клиникой и без неё">
           <div className="comparison-head">
             <Text n={37} as="h3" />
             <Text n={38} as="h3" />
@@ -224,9 +241,9 @@ export default function Home() {
           ))}
         </section>
         <section className="section team" id="team">
-          <div className="section-heading">
-            <Text n={53} as="h2" />
+          <div className="intro-title">
             <Mark />
+            <Text n={53} as="h2" />
           </div>
           <Text n={54} className="team-intro lead" />
           <div className="doctors">
@@ -298,8 +315,10 @@ export default function Home() {
         </section>
         <section className="section split" id="history">
           <div>
-            <Mark />
-            <Text n={88} as="h2" />
+            <div className="intro-title">
+              <Mark />
+              <Text n={88} as="h2" />
+            </div>
             <div className="stats">
               {[
                 ["20 лет", "премиальной выездной медицины"],
@@ -319,17 +338,21 @@ export default function Home() {
           <Photo name="history" alt="Фасад ЕС Клиники с надписью «Основана в 2006»" />
         </section>
         <section className="loyalty">
-          <Photo name="loyalty" alt="Семья — несколько поколений вместе" />
+          <Photo name="loyalty" alt="Семья – несколько поколений вместе" />
           <div>
             <Text n={90} as="h2" />
           </div>
         </section>
         <section className="section testimonial" id="reviews">
-          <Text n={92} as="h2" />
+          <div className="intro-title">
+            <Mark />
+            <Text n={92} as="h2" />
+          </div>
           <div className="review-grid">
             <div>
-              <Mark />
-              <Text n={93} as="h3" />
+              <div className="review-author-title">
+                <Text n={93} as="h3" />
+              </div>
               <Text n={94} />
             </div>
             <blockquote>
@@ -338,6 +361,22 @@ export default function Home() {
                 {[96, 97, 98].map((n) => (
                   <Text n={n} key={n} />
                 ))}
+              </ProcessStep>
+            </blockquote>
+          </div>
+          <div className="review-grid">
+            <div>
+              <div className="review-author-title">
+                <Editable id="review-shumov-name" as="h3">Кристиан Шумов</Editable>
+              </div>
+              <Editable id="review-shumov-role">Основатель Центра протезирования и реабилитации «Динамика»</Editable>
+            </div>
+            <blockquote>
+              <Editable id="review-shumov-intro" className="lead">«Я правда уже не представляю свою жизнь без ЕС Клиники.</Editable>
+              <ProcessStep variant="review" heading="Читать отзыв полностью">
+                <Editable id="review-shumov-1">Особенно это почувствовал в ситуации с одной премиальной Клиникой: возникла задержка, но команда ЕС быстро подключилась и помогла всё решить. И в какой-то момент я поймал себя на мысли: «Как вообще я раньше жил без вас?»</Editable>
+                <Editable id="review-shumov-2">За последнее время было уже много таких ситуаций – от организации взаимодействия с другими клиниками до вопросов с лекарствами. Мне очень нравится, что я могу просто передать задачу команде и знать, что её доведут до результата.</Editable>
+                <Editable id="review-shumov-3">Огромное спасибо за вашу работу и за то, сколько медицинских вопросов вы снимаете с меня»</Editable>
               </ProcessStep>
             </blockquote>
           </div>
@@ -360,8 +399,10 @@ export default function Home() {
         </section>
         <section className="section split final-cta" id="consultation">
           <div>
-            <Mark />
-            <Text n={102} as="h2" />
+            <div className="intro-title">
+              <Mark />
+              <Text n={102} as="h2" />
+            </div>
             <Text n={103} />
             <Text n={104} />
             <ContactButton label={copy[105]} />
@@ -408,6 +449,8 @@ export default function Home() {
         </p>
       </footer>
       <EditorLauncher />
+      <ScrollEffects />
+      <ContactWidget />
     </EditorProvider>
   );
 }

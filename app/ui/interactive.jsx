@@ -75,7 +75,7 @@ export function SiteHeader() {
         </button>
         <span className="header-address">Москва, Барыковский переулок, д. 4, стр. 3</span>
       </div>
-      <a className="header-brand" href="#home" aria-label="ЕС Клиника — на главную">
+      <a className="header-brand" href="#home" aria-label="ЕС Клиника – на главную">
         <Image className="header-shield" src="/assets/official-hero-shield.svg" width={35} height={40} alt="" />
       </a>
       <div className="header-actions">

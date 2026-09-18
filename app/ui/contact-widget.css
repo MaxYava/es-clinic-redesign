@@ -1,0 +1,62 @@
+.esc-fab{position:fixed;right:clamp(16px,2vw,32px);bottom:clamp(16px,2vw,32px);z-index:40;
+  display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none;}
+.esc-fab__list{display:flex;flex-direction:column;gap:12px;pointer-events:none;}
+.esc-fab__btn{pointer-events:auto;}
+.esc-fab__item,.esc-fab__btn{width:60px;height:60px;flex:0 0 auto;border-radius:50%;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#DBA77D;border:1.22px solid rgba(254,245,228,.2);color:#FEF5E4;cursor:pointer;
+  box-shadow:0 10px 26px rgba(46,42,36,.22);text-decoration:none!important;
+  transition:transform .25s cubic-bezier(.22,1,.36,1),opacity .25s ease,background .2s ease;}
+.esc-fab__item svg,.esc-fab__btn svg{width:17.4px;height:17.4px;display:block;fill:currentColor;}
+.esc-fab__item:hover,.esc-fab__btn:hover{background:#d09a6b;}
+/* Закрепляем вид виджета за .esc-fab во ВСЕХ состояниях ссылки.
+   Пункт «Позвонить» – ссылка tel:, и внешние стили (шапка, Tilda, :visited/:active)
+   перекрашивали её в тёмный. Скоупим жёстко, шапку это не задевает. */
+.esc-fab .esc-fab__item,
+.esc-fab .esc-fab__item:link,
+.esc-fab .esc-fab__item:visited,
+.esc-fab .esc-fab__item:focus,
+.esc-fab .esc-fab__item:active{background:#DBA77D!important;color:#FEF5E4!important;
+  border:1.22px solid rgba(254,245,228,.2)!important;box-shadow:0 10px 26px rgba(46,42,36,.22)!important;}
+.esc-fab .esc-fab__item:hover{background:#d09a6b!important;}
+.esc-fab .esc-fab__item svg,.esc-fab .esc-fab__item path,
+.esc-fab .esc-fab__btn svg,.esc-fab .esc-fab__btn path{fill:currentColor!important;}
+.esc-fab .esc-fab__btn{background:#DBA77D!important;color:#FEF5E4!important;
+  border:1.22px solid rgba(254,245,228,.2)!important;}
+.esc-fab.is-open .esc-fab__btn{background:#533E2D!important;border-color:rgba(83,62,45,.3)!important;}
+.esc-fab.is-open .esc-fab__btn:hover{background:#43301f!important;}
+/* пункты спрятаны, пока виджет закрыт */
+.esc-fab__item{opacity:0;transform:translateY(14px) scale(.75);pointer-events:none;}
+.esc-fab.is-open .esc-fab__item{opacity:1;transform:none;pointer-events:auto;}
+/* каскад: появляются снизу вверх */
+.esc-fab.is-open .esc-fab__item:nth-child(4){transition-delay:.02s;}
+.esc-fab.is-open .esc-fab__item:nth-child(3){transition-delay:.07s;}
+.esc-fab.is-open .esc-fab__item:nth-child(2){transition-delay:.12s;}
+.esc-fab.is-open .esc-fab__item:nth-child(1){transition-delay:.17s;}
+/* открытый виджет: кнопка становится тёмной с крестиком */
+.esc-fab.is-open .esc-fab__btn{background:#533E2D;border-color:rgba(83,62,45,.3);}
+.esc-fab__ic--close svg{width:19px;height:19px;}
+.esc-fab.is-open .esc-fab__btn:hover{background:#43301f;}
+.esc-fab__ic{display:flex;align-items:center;justify-content:center;}
+.esc-fab__ic--close{display:none;}
+.esc-fab.is-open .esc-fab__ic--phone{display:none;}
+.esc-fab.is-open .esc-fab__ic--close{display:flex;}
+/* пульс-подсказка, пока виджет закрыт */
+.esc-fab__btn::after{content:"";position:absolute;inset:-1px;border-radius:50%;
+  border:2px solid rgba(219,167,125,.7);animation:esc-fab-ping 2.8s ease-out infinite;pointer-events:none;}
+.esc-fab.is-open .esc-fab__btn::after{display:none;}
+.esc-fab__btn{position:relative;}
+@keyframes esc-fab-ping{0%{transform:scale(1);opacity:.6;}70%,100%{transform:scale(1.6);opacity:0;}}
+@media (max-width:768px){
+  .esc-fab{right:14px;bottom:14px;gap:10px;}
+  .esc-fab__list{gap:10px;}
+  .esc-fab__item,.esc-fab__btn{width:52px;height:52px;}
+  .esc-fab__item svg,.esc-fab__btn svg{width:16px;height:16px;}
+  .esc-fab__ic--close svg{width:17px;height:17px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .esc-fab__item{transition:none;}
+  .esc-fab__btn::after{animation:none;display:none;}
+}
+
+.esc-fab__item:focus-visible,.esc-fab__btn:focus-visible{outline:2px solid #533e2d;outline-offset:4px;}
