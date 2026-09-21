@@ -92,7 +92,6 @@ export function RebuiltHero() {
         </div>
       </dialog>
     <section className={s.screen} data-hero-ready={ready} aria-label="ЕС Клиника – Медицинский Family Office" data-hero-version="rebuilt" data-layout-scope="official-hero-v2">
-      <div className={s.decoration} aria-hidden="true"><Image src="/assets/official-hero-deco.svg" fill alt="" /></div>
       <div className={s.inner}>
         <div className={s.content}>
           <Editable id="rebuilt-eyebrow" as="div" className={s.eyebrow}>{"Медицинский\nFamily Office"}</Editable>
