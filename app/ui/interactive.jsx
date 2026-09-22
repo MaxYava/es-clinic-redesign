@@ -1,13 +1,37 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+import { Children, useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
+import { Editable } from "./editor";
 
 export function ProcessStep({ heading, children, variant = "process" }) {
   const detailsRef = useRef(null);
   const contentRef = useRef(null);
   const animationRef = useRef(null);
   const targetOpen = useRef(false);
+  const reviewTriggerRef = useRef(null);
+  const reviewDialogRef = useRef(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewMeta, setReviewMeta] = useState({ name: "", role: "", intro: "" });
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useEffect(() => () => animationRef.current?.cancel(), []);
+  useEffect(() => {
+    if (variant !== "review" || !reviewOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.body.classList.add("review-modal-open");
+    const close = (event) => {
+      if (event.key === "Escape") setReviewOpen(false);
+    };
+    window.addEventListener("keydown", close);
+    requestAnimationFrame(() => reviewDialogRef.current?.focus());
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.classList.remove("review-modal-open");
+      window.removeEventListener("keydown", close);
+    };
+  }, [reviewOpen, variant]);
   const toggle = (event) => {
     event.preventDefault();
     const details = detailsRef.current;
@@ -35,6 +59,42 @@ export function ProcessStep({ heading, children, variant = "process" }) {
       animationRef.current = null;
     };
   };
+  const openReview = () => {
+    const card = reviewTriggerRef.current?.closest(".review-card");
+    setReviewMeta({
+      name: card?.querySelector("h3")?.textContent?.trim() || "",
+      role: card?.querySelector(".review-author > p")?.textContent?.trim() || "",
+      intro: card?.querySelector("blockquote > .lead")?.textContent?.trim() || "",
+    });
+    setReviewOpen(true);
+  };
+  if (variant === "review") {
+    return (
+      <>
+        <button className="review-open" type="button" ref={reviewTriggerRef} onClick={openReview}>
+          <span>{heading}</span>
+          <span className="review-open-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M7 2v10M2 7h10" /></svg></span>
+        </button>
+        {mounted && reviewOpen && createPortal(
+          <div className="review-modal" onMouseDown={(event) => { if (event.target === event.currentTarget) setReviewOpen(false); }}>
+            <section className="review-modal-panel" role="dialog" aria-modal="true" aria-label="Полный текст отзыва" ref={reviewDialogRef} tabIndex={-1}>
+              <button className="review-modal-close" type="button" aria-label="Закрыть отзыв" onClick={() => setReviewOpen(false)}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M3 3l12 12M15 3 3 15" /></svg>
+              </button>
+              <div className="review-modal-label">Отзыв полностью</div>
+              <div className="review-modal-head">
+                <h3>{reviewMeta.name}</h3>
+                <p>{reviewMeta.role}</p>
+              </div>
+              <blockquote className="review-modal-intro">{reviewMeta.intro}</blockquote>
+              <div className="review-modal-copy">{children}</div>
+            </section>
+          </div>,
+          document.body,
+        )}
+      </>
+    );
+  }
   return (
     <details className={`${variant}-step`} ref={detailsRef}>
       <summary onClick={toggle}>
@@ -43,6 +103,99 @@ export function ProcessStep({ heading, children, variant = "process" }) {
       </summary>
       <div className={variant === "process" ? "process-content" : "faq-content"} ref={contentRef}><div className={variant === "contract" ? "contract-answer" : variant === "process" ? "process-description" : "faq-answer"}>{children}</div></div>
     </details>
+  );
+}
+
+export function ReviewsCarousel({ children }) {
+  const items = Children.toArray(children);
+  const viewportRef = useRef(null);
+  const interaction = useRef({ pointer: null, moved: false, suppressClick: false, lastX: 0, startX: 0, position: 0, resumeAt: 0 });
+
+  // Keep a floating-point position and wrap every movement, including a drag.
+  // A drag never depends on a stale scroll origin from before the loop seam.
+  const move = (distance) => {
+    const viewport = viewportRef.current;
+    const cycle = viewport?.firstElementChild?.firstElementChild?.getBoundingClientRect().width;
+    if (!cycle) return;
+    const state = interaction.current;
+    state.position = ((state.position + distance) % cycle + cycle) % cycle;
+    viewport.scrollLeft = state.position;
+  };
+
+  useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    let previous = performance.now();
+    const tick = (now) => {
+      const state = interaction.current;
+      if (!motion.matches && state.pointer === null && now >= state.resumeAt && !document.hidden && !document.body.classList.contains("review-modal-open")) {
+        const ramp = state.resumeAt ? Math.min(1, (now - state.resumeAt) / 1200) : 1;
+        const speed = ramp * ramp * (3 - 2 * ramp);
+        move(Math.min(now - previous, 40) * .035 * speed);
+      }
+      previous = now;
+      frame = requestAnimationFrame(tick);
+    };
+    const resize = new ResizeObserver(() => move(0));
+    resize.observe(viewportRef.current);
+    frame = requestAnimationFrame(tick);
+    return () => { cancelAnimationFrame(frame); resize.disconnect(); };
+  }, []);
+
+  const pointerDown = (event) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    const state = interaction.current;
+    state.pointer = event.pointerId;
+    state.moved = false;
+    state.suppressClick = false;
+    state.lastX = state.startX = event.clientX;
+  };
+  const pointerMove = (event) => {
+    const state = interaction.current;
+    if (state.pointer !== event.pointerId) return;
+    if (!state.moved && Math.abs(event.clientX - state.startX) < 5) return;
+    state.moved = true;
+    state.suppressClick = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.currentTarget.dataset.dragging = "true";
+    move(state.lastX - event.clientX);
+    state.lastX = event.clientX;
+    event.preventDefault();
+  };
+  const pointerUp = (event) => {
+    const state = interaction.current;
+    if (state.pointer !== event.pointerId) return;
+    state.pointer = null;
+    if (state.moved) state.resumeAt = performance.now() + 2000;
+    delete event.currentTarget.dataset.dragging;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
+  return (
+    <div
+      className="reviews-carousel"
+      aria-label="Отзывы клиентов"
+      ref={viewportRef}
+      onPointerDown={pointerDown}
+      onPointerMove={pointerMove}
+      onPointerUp={pointerUp}
+      onPointerCancel={pointerUp}
+      onLostPointerCapture={pointerUp}
+      onPointerLeave={event => { if (!interaction.current.moved) pointerUp(event); }}
+      onDragStart={event => event.preventDefault()}
+      onWheel={event => { if (event.deltaX || event.shiftKey) move(event.deltaX || event.deltaY); }}
+      onClickCapture={(event) => {
+        if (!interaction.current.suppressClick) return;
+        event.preventDefault();
+        event.stopPropagation();
+        interaction.current.suppressClick = false;
+      }}
+    >
+      <div className="reviews-track">
+        <div className="reviews-group">{items}</div>
+        <div className="reviews-group reviews-group-copy">{items}</div>
+      </div>
+    </div>
   );
 }
 
@@ -96,39 +249,124 @@ export function SiteHeader() {
 }
 
 export function VideoCard() {
-  const [playing, setPlaying] = useState(false);
+  const videoRef = useRef(null);
+  const frameCallbackRef = useRef(null);
+  const [mode, setMode] = useState("idle");
+  const [posterVisible, setPosterVisible] = useState(true);
+
+  const showFirstVideoFrame = (video) => {
+    if (frameCallbackRef.current !== null && video.cancelVideoFrameCallback) {
+      video.cancelVideoFrameCallback(frameCallbackRef.current);
+    }
+    if (video.requestVideoFrameCallback) {
+      frameCallbackRef.current = video.requestVideoFrameCallback(() => {
+        frameCallbackRef.current = null;
+        setPosterVisible(false);
+      });
+    } else {
+      requestAnimationFrame(() => requestAnimationFrame(() => setPosterVisible(false)));
+    }
+  };
+
+  const playPreview = () => {
+    if (mode === "engaged") return;
+    const video = videoRef.current;
+    video.muted = true;
+    setMode("preview");
+    video.play().then(() => showFirstVideoFrame(video)).catch(() => {});
+  };
+
+  const stopPreview = () => {
+    if (mode !== "preview") return;
+    videoRef.current?.pause();
+    setMode("idle");
+  };
+
+  const enableSound = () => {
+    const video = videoRef.current;
+    video.muted = false;
+    setMode("engaged");
+    video.play().then(() => showFirstVideoFrame(video)).catch(() => {});
+  };
+
+  useEffect(() => () => {
+    const video = videoRef.current;
+    if (frameCallbackRef.current !== null && video?.cancelVideoFrameCallback) {
+      video.cancelVideoFrameCallback(frameCallbackRef.current);
+    }
+  }, []);
+
   return (
-    <div className="video-card">
-      {playing ? (
-        <video
-          src="/assets/daria-tishina-web.mp4"
-          controls
-          autoPlay
-          playsInline
-          preload="none"
-          aria-label="Дарья Тишина о Медицинском Family Office"
-        />
-      ) : (
-        <>
-          <Image
-            src="/assets/daria-enhanced.webp"
-            unoptimized
-            alt="Дарья Сергеевна Тишина"
-            fill
-            sizes="(max-width: 760px) 90vw, 420px"
-          />
+    <div
+      className="video-card"
+      data-layout-id="video-card"
+      data-mode={mode}
+      onMouseEnter={playPreview}
+      onMouseLeave={stopPreview}
+    >
+      <video
+        ref={videoRef}
+        src="/assets/daria-tishina-web.mp4"
+        controls={mode === "engaged"}
+        playsInline
+        preload="none"
+        aria-label="Дарья Тишина о Медицинском Family Office"
+      />
+      <Image
+        className={`video-poster${posterVisible ? "" : " is-hidden"}`}
+        src="/assets/daria-enhanced.webp"
+        unoptimized
+        alt="Дарья Сергеевна Тишина"
+        fill
+        sizes="(max-width: 760px) 90vw, 420px"
+      />
+      <div className={`video-shade${posterVisible ? "" : " is-hidden"}`} aria-hidden="true" />
+      {mode !== "engaged" && (
           <button
             className="video-play"
-            onClick={() => setPlaying(true)}
+            onClick={enableSound}
             aria-label="Смотреть видео с Дарьей Тишиной"
           >
             <span aria-hidden="true">▶</span>
           </button>
-          <div className="video-caption">
-            Дарья Тишина<span>Медицинский директор ЕС Клиники</span>
-          </div>
-        </>
       )}
+      <div className={`video-caption${posterVisible ? "" : " is-hidden"}`}>
+        Дарья Тишина<span>Медицинский директор ЕС Клиники</span>
+      </div>
+    </div>
+  );
+}
+export function ConsultationLeadForm() {
+  const [status, setStatus] = useState("");
+  const submit = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    setStatus("Форма заполнена. Для отправки заявки напишите нам в Telegram или позвоните по номеру +7 (495) 868-18-57.");
+  };
+  return (
+    <div className="consultation-lead-form">
+      <div className="consultation-lead-inner">
+        <Editable id="consultation-lead-title" as="h2" className="consultation-lead-title">
+          Оставьте заявку — мы расскажем, как устроено системное ведение здоровья семьи
+        </Editable>
+        <form onSubmit={submit}>
+          <input className="consultation-lead-field" type="text" name="name" placeholder="Ваше имя" autoComplete="name" maxLength="60" required />
+          <input className="consultation-lead-field" type="tel" name="phone" placeholder="Ваш номер телефона" autoComplete="tel" inputMode="tel" required />
+          <label className="consultation-lead-agree">
+            <input className="consultation-lead-checkbox" type="checkbox" name="agree" required />
+            <span className="consultation-lead-checkmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l5 5L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
+            <span>Подтверждаю, что согласен <a href="https://es-clinic.ru/consent-data" target="_blank" rel="noopener noreferrer">с условиями использования персональных данных</a> и с <a href="https://es-clinic.ru/legal" target="_blank" rel="noopener noreferrer">пользовательским соглашением</a></span>
+          </label>
+          <button className="consultation-lead-submit" type="submit">Получить консультацию<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
+        </form>
+        {status && <p className="consultation-lead-status" role="status">{status}</p>}
+        <p className="consultation-lead-or">Или напишите нам в мессенджер</p>
+        <div className="consultation-lead-messengers">
+          <a href="https://telegram.me/esclinic_bot" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.27 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z" /></svg></a>
+          <a href="https://wa.me/79671330849" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-1.76-.89-2.92-1.59-4.08-3.59-.31-.53.31-.49.89-1.63.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35ZM12.05 21.79h-.01a9.88 9.88 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26C2.17 6.44 6.6 2.01 12.06 2.01c2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.89-9.89 9.89Z" /></svg></a>
+        </div>
+      </div>
     </div>
   );
 }

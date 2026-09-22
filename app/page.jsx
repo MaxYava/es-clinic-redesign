@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { ComparisonReveal } from "./ui/comparison-reveal";
+import { ContractTree, ContractDetail } from "./ui/contract-tree";
 import { ScrollEffects } from "./ui/scroll-effects";
 import { RebuiltHero } from "./ui/rebuilt-hero";
 import { ContactWidget } from "./ui/contact-widget";
@@ -12,7 +14,7 @@ import {
   EditablePhoto,
   EditorLauncher,
 } from "./ui/editor";
-import { VideoCard, ContactButton, SiteHeader, ProcessStep } from "./ui/interactive";
+import { VideoCard, ContactButton, ConsultationLeadForm, ReviewsCarousel, SiteHeader, ProcessStep } from "./ui/interactive";
 
 const Text = ({ n, as = "p", className = "" }) => (
   <Editable id={`copy-${n}`} as={as} className={className}>
@@ -29,6 +31,82 @@ const Photo = ({ name, alt, className = "" }) => (
 );
 const Mark = () => (
   <Image src="/assets/clover.svg" width={30} height={30} alt="" />
+);
+const decorativeCloverPath =
+  "M19.3612 7.84705C18.3914 7.85021 17.514 8.23688 16.8657 8.85893V8.85578C15.5491 10.0683 13.9246 10.6095 12.1741 10.8491C12.3863 9.08694 12.8959 7.44882 14.1064 6.11541H14.1032C14.7211 5.46289 15.1015 4.58236 15.0983 3.61252C15.091 1.60978 13.4623 -0.00733028 11.4595 2.49919e-05C9.45681 0.00738027 7.8397 1.63605 7.84705 3.63879C7.85021 4.60863 8.23688 5.48601 8.85893 6.13433H8.85578C10.0694 7.45092 10.6095 9.07538 10.8491 10.8259C9.08694 10.6137 7.44882 10.1041 6.11541 8.89361V8.89676C5.46289 8.27891 4.58236 7.89854 3.61252 7.90169C1.60978 7.90905 -0.00733028 9.53772 2.49919e-05 11.5405C0.00738027 13.5432 1.63605 15.1603 3.63879 15.1529C4.60863 15.1498 5.48601 14.7631 6.13433 14.1411V14.1442C7.45092 12.9317 9.07539 12.3905 10.8259 12.1509C10.6137 13.9131 10.1041 15.5512 8.89361 16.8846H8.89676C8.27891 17.5371 7.89854 18.4176 7.90169 19.3875C7.90905 21.3902 9.53772 23.0073 11.5405 23C13.5432 22.9926 15.1603 21.364 15.1529 19.3612C15.1498 18.3914 14.7631 17.514 14.1411 16.8657H14.1442C12.9317 15.5491 12.3905 13.9246 12.1509 12.1741C13.9131 12.3863 15.5522 12.8959 16.8846 14.1064V14.1032C17.5371 14.7211 18.4176 15.1015 19.3875 15.0983C21.3902 15.091 23.0073 13.4623 23 11.4595C22.9916 9.45681 21.3629 7.8397 19.3612 7.84705Z";
+const DecorativeClover = ({ className }) => (
+  <svg
+    className={className}
+    viewBox="0 0 23 23"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d={decorativeCloverPath} />
+  </svg>
+);
+const GlassClover = () => (
+  <svg
+    className="system-clover-outline"
+    viewBox="0 0 23 23"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <defs>
+      <linearGradient id="system-clover-edge-hi" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#fff" stopOpacity="1" />
+        <stop offset=".42" stopColor="#fff" stopOpacity="0" />
+        <stop offset="1" stopColor="#fff" stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id="system-clover-edge-lo" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#fff" stopOpacity="0" />
+        <stop offset=".58" stopColor="#fff" stopOpacity="0" />
+        <stop offset="1" stopColor="#fff" stopOpacity=".9" />
+      </linearGradient>
+      <filter
+        id="system-clover-glass-distortion"
+        x="-15%"
+        y="-15%"
+        width="130%"
+        height="130%"
+        colorInterpolationFilters="sRGB"
+      >
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.011 0.011"
+          numOctaves="2"
+          seed="4"
+          result="noise"
+        />
+        <feGaussianBlur in="noise" stdDeviation="1.1" result="softNoise" />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="softNoise"
+          scale="10"
+          xChannelSelector="R"
+          yChannelSelector="G"
+        />
+      </filter>
+    </defs>
+    <path
+      d={decorativeCloverPath}
+      fill="none"
+      stroke="url(#system-clover-edge-hi)"
+      strokeWidth="1.8"
+      vectorEffect="non-scaling-stroke"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+    />
+    <path
+      d={decorativeCloverPath}
+      fill="none"
+      stroke="url(#system-clover-edge-lo)"
+      strokeWidth="1.3"
+      vectorEffect="non-scaling-stroke"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+    />
+  </svg>
 );
 const stages = [
   [20, null],
@@ -65,7 +143,7 @@ const doctors = [
   { image: "utin", name: 57, role: 58, url: "https://es-clinic.ru/vrachi" },
 ];
 const partnerLogoIndex = {
-  "Мать и дитя": 0, "Чайка": 1, "Клиника Фомина": 2, "K+31": 3,
+  "Мать и дитя": 0, "Чайка": 1, "K+31": 3,
   "Docdeti": 4, "ФГБУ НМИЦК Чазова": 5, "Сеченовский Университет": 6,
   "Морозовская детская больница": 7, "Коммунарка": 8, "Три сестры": 9,
   "ЕМС": 10, "GMS": 11, "Hadassah": 12,
@@ -137,21 +215,6 @@ export default function Home() {
             <Text n={5} />
           </div>
         </section>}
-        <nav className="section-nav" aria-label="Разделы страницы">
-          {[
-            ["Medical Family Office", "#approach", "medical-family-office"],
-            ["Ценности", "#responsibility", "values"],
-            ["Наши врачи", "#team", "doctors"],
-            ["История", "#history", "history"],
-            ["Контакты", "#contacts", "contacts"],
-          ].map(([label, href, icon]) => (
-            <a key={icon} href={href} {...(href.startsWith("https:") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-              <span className="section-nav-icon" aria-hidden="true"><Image src={`/assets/section-icons/${icon}.png`} width={48} height={48} alt="" unoptimized /></span>
-              {label}
-            </a>
-          ))}
-        </nav>
-
         <section className="section split intro" id="approach">
           <div>
             <div className="intro-title">
@@ -167,16 +230,42 @@ export default function Home() {
           </div>
           <VideoCard />
         </section>
+        <section className="family-showcase-section" aria-label="Семья дома">
+          <EditablePhoto
+            id="photo-family-showcase"
+            src="/assets/official-family-showcase.png"
+            alt="Семья проводит время вместе дома"
+            className="family-showcase"
+          />
+        </section>
         <section className="section split system" id="system">
-          <Photo name="family" alt="Бабушка целует внука" />
-          <div>
+          <span
+            className="system-clover system-clover-glass"
+            data-layout-id="system-clover-glass-right"
+            data-editor-label="Клевер с размытием"
+            aria-hidden="true"
+          >
+            <GlassClover />
+          </span>
+          <DecorativeClover className="system-clover system-clover-soft" />
+          <div className="system-copy">
             <div className="intro-title">
               <Mark />
               <Text n={13} as="h2" />
             </div>
             <Text n={14} className="lead" />
-            <Text n={15} />
+            <Text n={15} className="system-lower-copy" />
           </div>
+          <Photo name="family" alt="Бабушка целует внука" />
+        </section>
+        <section className="section consultation-lead" id="application">
+          <EditablePhoto
+            id="photo-consultation-lead"
+            src="/assets/official-reception-form.png"
+            alt="Сотрудницы ресепшена ЕС Клиники"
+            className="consultation-lead-photo"
+          />
+          <ConsultationLeadForm />
         </section>
         <section className="section split responsibility" id="responsibility">
           <div>
@@ -188,7 +277,7 @@ export default function Home() {
           </div>
           <Photo
             name="reception"
-            alt="Две сотрудницы за стойкой ресепшена ЕС Клиники"
+            alt="Светлый холл и стойка ресепшена ЕС Клиники"
           />
         </section>
 
@@ -198,13 +287,8 @@ export default function Home() {
             <Mark />
           </div>
           <ol className="process-list">
-            {stages.map(([title, body], index) => {
-              const heading = (
-                <>
-                  <span className="process-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                  <Editable id={`copy-${title}`} as="h3">{copy[title].replace(/^\d+\s+/, "")}</Editable>
-                </>
-              );
+            {stages.map(([title, body]) => {
+              const heading = <Editable id={`copy-${title}`} as="h3">{copy[title].replace(/^\d+\s+/, "")}</Editable>;
               return (
                 <li key={title}>
                   <ProcessStep heading={heading}>
@@ -216,29 +300,16 @@ export default function Home() {
               );
             })}
           </ol>
-          <a
-            className="process-more"
-            href="https://es-clinic.ru/medicalfamilyoffice"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Text n={36} as="span" />
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M6 18 18 6M6 6h12v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
         </section>
         <section className="section comparison" id="comparison" aria-label="Сравнение сопровождения с ЕС Клиникой и без неё">
-          <div className="comparison-head">
-            <Text n={37} as="h3" />
-            <Text n={38} as="h3" />
+          <div className="section-heading">
+            <Editable id="comparison-title" as="h2">Внедрить единую систему управления здоровьем</Editable>
           </div>
-          {Array.from({ length: 7 }, (_, i) => (
-            <div className="comparison-row" key={i}>
-              <Text n={39 + i * 2} />
-              <Text n={40 + i * 2} />
-            </div>
-          ))}
+          <ComparisonReveal
+            beforeLabel={copy[37]} afterLabel={copy[38]}
+            before={Array.from({ length: 7 }, (_, i) => <Text key={i} n={39 + i * 2} />)}
+            after={Array.from({ length: 7 }, (_, i) => <Text key={i} n={40 + i * 2} />)}
+          />
         </section>
         <section className="section team" id="team">
           <div className="intro-title">
@@ -273,10 +344,8 @@ export default function Home() {
           </a>
         </section>
         <section className="section contract" id="contract">
-          <Text n={60} as="h2" />
-          <Text n={61} className="lead" />
-          {groups.map((group) => (
-            <ProcessStep key={group.title} variant="contract" heading={<Text n={group.title} as="span" />}>
+          <ContractTree heading={<><Text n={60} as="h2" /><Text n={61} className="lead" /></>}>{groups.map((group) => (
+            <ContractDetail key={group.title} title={copy[group.title]} heading={<Text n={group.title} as="span" />}>
               <div className="services">
                 {group.items.map((ids) => (
                   <article key={ids[0]}>
@@ -293,8 +362,8 @@ export default function Home() {
                   </article>
                 ))}
               </div>
-            </ProcessStep>
-          ))}
+            </ContractDetail>
+          ))}</ContractTree>
         </section>
         <section className="section partners" id="partners">
           <Text n={86} as="h2" />
@@ -322,15 +391,15 @@ export default function Home() {
             <div className="stats">
               {[
                 ["20 лет", "премиальной выездной медицины"],
-                ["34", "направления диагностики и лечения"],
+                ["Тут надо", "на что-то изменить"],
                 ["100+", "партнёров"],
                 ["380", "активных клиентов"],
               ].map(([n, label], i) => (
                 <div key={i}>
-                  <Editable id={`stat-${i}`} as="strong">
+                  <Editable id={i === 1 ? "stat-placeholder" : `stat-${i}`} as="strong">
                     {n}
                   </Editable>
-                  <Editable id={`stat-label-${i}`}>{label}</Editable>
+                  <Editable id={i === 1 ? "stat-placeholder-label" : `stat-label-${i}`}>{label}</Editable>
                 </div>
               ))}
             </div>
@@ -348,38 +417,68 @@ export default function Home() {
             <Mark />
             <Text n={92} as="h2" />
           </div>
-          <div className="review-grid">
-            <div>
+          <ReviewsCarousel>
+            <article className="review-card">
+              <div className="review-author">
               <div className="review-author-title">
                 <Text n={93} as="h3" />
               </div>
               <Text n={94} />
-            </div>
-            <blockquote>
+              </div>
+              <blockquote>
               <Text n={95} className="lead" />
               <ProcessStep variant="review" heading="Читать отзыв полностью">
                 {[96, 97, 98].map((n) => (
                   <Text n={n} key={n} />
                 ))}
               </ProcessStep>
-            </blockquote>
-          </div>
-          <div className="review-grid">
-            <div>
+              </blockquote>
+            </article>
+            <article className="review-card">
+              <div className="review-author">
               <div className="review-author-title">
                 <Editable id="review-shumov-name" as="h3">Кристиан Шумов</Editable>
               </div>
               <Editable id="review-shumov-role">Основатель Центра протезирования и реабилитации «Динамика»</Editable>
-            </div>
-            <blockquote>
+              </div>
+              <blockquote>
               <Editable id="review-shumov-intro" className="lead">«Я правда уже не представляю свою жизнь без ЕС Клиники.</Editable>
               <ProcessStep variant="review" heading="Читать отзыв полностью">
                 <Editable id="review-shumov-1">Особенно это почувствовал в ситуации с одной премиальной Клиникой: возникла задержка, но команда ЕС быстро подключилась и помогла всё решить. И в какой-то момент я поймал себя на мысли: «Как вообще я раньше жил без вас?»</Editable>
                 <Editable id="review-shumov-2">За последнее время было уже много таких ситуаций – от организации взаимодействия с другими клиниками до вопросов с лекарствами. Мне очень нравится, что я могу просто передать задачу команде и знать, что её доведут до результата.</Editable>
                 <Editable id="review-shumov-3">Огромное спасибо за вашу работу и за то, сколько медицинских вопросов вы снимаете с меня»</Editable>
               </ProcessStep>
-            </blockquote>
-          </div>
+              </blockquote>
+            </article>
+            <article className="review-card">
+              <div className="review-author">
+                <div className="review-author-title">
+                  <Editable id="review-krasnova-name" as="h3">Алёна Краснова</Editable>
+                </div>
+                <Editable id="review-krasnova-role">Блогер</Editable>
+              </div>
+              <blockquote>
+                <Editable id="review-krasnova-intro" className="lead">«Сначала лечили меня, а теперь моих детей»</Editable>
+                <ProcessStep variant="review" heading="Читать отзыв полностью">
+                  <Editable id="review-krasnova-body">Хочу сказать большое спасибо моему любимому доктору Волковой Галине Анатольевне. Мы вместе уже 25 лет! Вы меня лечили и выхаживали, а сейчас являетесь семейным доктором у моих крошек-близнецов. Благодаря вашей заботе, вниманию и чуткому отношению наши проблемы, неуверенность и страх развеялись. Спасибо, что вы с нами! Нам с вами спокойно.</Editable>
+                </ProcessStep>
+              </blockquote>
+            </article>
+            <article className="review-card">
+              <div className="review-author">
+                <div className="review-author-title">
+                  <Editable id="review-demidova-name" as="h3">Наталья Демидова</Editable>
+                </div>
+                <Editable id="review-demidova-role">HR-директор международной компании</Editable>
+              </div>
+              <blockquote>
+                <Editable id="review-demidova-intro" className="lead">«Когда нет времени болеть — нужна медицина, которая работает на тебя»</Editable>
+                <ProcessStep variant="review" heading="Читать отзыв полностью">
+                  <Editable id="review-demidova-body">Я часто в командировках, и мне важно быть уверенной, что мои близкие под контролем. После серьёзного приступа у мамы врач подобрала новую схему лечения, наладила давление и режим — теперь всё стабильно. А мне самой провели чекап прямо дома. Это не просто клиника — это забота, которая всегда рядом.</Editable>
+                </ProcessStep>
+              </blockquote>
+            </article>
+          </ReviewsCarousel>
         </section>
         <section className="section faq" id="faq">
           <Text n={99} as="h2" />
@@ -410,44 +509,68 @@ export default function Home() {
           <Photo name="clinic" alt="Стойка ресепшена и партнёры ЕС Клиники" />
         </section>
       </main>
-      <footer id="contacts">
-        <div className="footer-top">
-          <div>
-            <Image
-              src="/assets/logo.svg"
-              width={230}
-              height={35}
-              alt="ЕС Клиника"
-            />
-            <p>Медицинский Family Office</p>
+      <div className="footer-stage">
+        <section className="prefooter-photo" aria-label="Здание ЕС Клиники">
+          <Image
+            src="/assets/official-footer-building.png"
+            alt="Фасад здания ЕС Клиники"
+            fill
+            sizes="100vw"
+          />
+        </section>
+        <footer id="contacts">
+          <div className="footer-brand">
+            <Image src="/assets/official-hero-shield.svg" width={48} height={58} alt="" />
+            <strong>ЕС Клиника</strong>
+            <span>Основана в 2006 году</span>
           </div>
-          <div>
-            <a href="tel:+74958681857">+7 (495) 868-18-57</a>
-            <p>Москва, Барыковский переулок, д. 4, стр. 3</p>
-            <a
-              href="https://telegram.me/esclinic_bot"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Написать в Telegram ↗
-            </a>
+          <div className="footer-columns">
+            <section>
+              <h2>Контакты</h2>
+              <a href="tel:+74958681857">+7 (495) 868-18-57</a>
+              <a href="mailto:office@es-job.ru">office@es-job.ru</a>
+              <p>Москва, Барыковский переулок, д. 4, стр. 3</p>
+              <div className="footer-socials" aria-label="Социальные сети ЕС Клиники">
+                <a href="https://telegram.me/es_family_office" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 11.3 15.8-6.1c.7-.3 1.3.2 1.1 1l-2.7 12.7c-.1.7-.8.9-1.4.6l-4.1-3-2 1.9c-.2.2-.4.4-.8.4l.3-4.2 7.7-7c.3-.3-.1-.5-.5-.2l-9.5 6-4.1-1.3c-.9-.3-.9-.9.2-1.3Z" /></svg>
+                </a>
+                <a href="https://www.instagram.com/es_family_office" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" /><circle cx="12" cy="12" r="3.7" /><circle cx="17.4" cy="6.8" r="1" className="fill-icon" /></svg>
+                </a>
+                <a href="https://www.youtube.com/channel/UCtx2IBeNXIxW6e-_a9GKG4A" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 7.1c-.2-.9-.9-1.6-1.8-1.8C16.8 5 12 5 12 5s-4.8 0-6.4.3c-.9.2-1.6.9-1.8 1.8A18.4 18.4 0 0 0 3.5 12c0 1.6.1 3.3.3 4.9.2.9.9 1.6 1.8 1.8 1.6.3 6.4.3 6.4.3s4.8 0 6.4-.3c.9-.2 1.6-.9 1.8-1.8.2-1.6.3-3.3.3-4.9s-.1-3.3-.3-4.9Z" /><path d="m10 15.2 5-3.2-5-3.2v6.4Z" className="play-icon" /></svg>
+                </a>
+                <a href="https://wa.me/79671330849" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" /></svg>
+                </a>
+              </div>
+            </section>
+            <nav aria-label="Навигация в подвале сайта">
+              <h2>Меню</h2>
+              <a href="#approach">Medical Family Office</a>
+              <a href="#responsibility">Ценности</a>
+              <a href="#history">История</a>
+              <a href="#comparison">Для кого мы работаем</a>
+              <a href="#contract">Что входит в годовой контракт</a>
+              <a href="#team">Наши врачи</a>
+              <a href="https://es-clinic.ru/career" target="_blank" rel="noopener noreferrer">Карьера</a>
+              <a href="https://es-clinic.ru/partners" target="_blank" rel="noopener noreferrer">Партнёрам</a>
+            </nav>
+            <section>
+              <h2>Документы</h2>
+              <a href="https://es-clinic.ru/legal" target="_blank" rel="noopener noreferrer">Правовые документы</a>
+              <a href="https://es-clinic.ru/consent-data" target="_blank" rel="noopener noreferrer">Согласие на обработку персональных данных</a>
+              <a href="https://es-clinic.ru/privacy" target="_blank" rel="noopener noreferrer">Политика конфиденциальности</a>
+              <a href="https://es-clinic.ru/payment" target="_blank" rel="noopener noreferrer">Онлайн-оплата</a>
+            </section>
           </div>
-        </div>
-        <div className="footer-bottom">
-          <span>© ЕС Клиника, 2026</span>
-          <a
-            href="https://es-clinic.ru/legal"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Документы и правовая информация ↗
-          </a>
-          <span>Локальная версия для обсуждения</span>
-        </div>
-        <p className="disclaimer">
-          Имеются противопоказания. Необходима консультация специалиста.
-        </p>
-      </footer>
+          <div className="footer-bottom">
+            <p>*Instagram признана экстремистской организацией, деятельность которой запрещена в РФ</p>
+            <a href="https://es-clinic.ru/" target="_blank" rel="noopener noreferrer">Версия для слабовидящих</a>
+            <span>ООО «ЕС-КЛИНИКА»</span>
+          </div>
+        </footer>
+      </div>
       <EditorLauncher />
       <ScrollEffects />
       <ContactWidget />

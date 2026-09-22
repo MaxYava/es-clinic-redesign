@@ -11,8 +11,8 @@ export function ScrollEffects() {
     const counters = new Map();
     const frames = new Set();
     let stopped = false;
-    const elements = [...document.querySelectorAll("main .section [data-edit-kind='text'], main .section [data-edit-kind='photo'], main .section details, main .loyalty [data-edit-kind], .partner-grid > div, footer")]
-      .filter(el => !el.parentElement.closest("[data-edit-kind], details"));
+    const elements = [...document.querySelectorAll("main .section [data-edit-kind='text'], main .section [data-edit-kind='photo'], main .family-showcase-section [data-edit-kind='photo'], main .section details:not(.process-step), main .process-list > li, main .loyalty [data-edit-kind], .partner-grid > div")]
+      .filter(el => !el.closest("#comparison") && !el.parentElement.closest("[data-edit-kind], details"));
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
@@ -27,9 +27,9 @@ export function ScrollEffects() {
       const delay = Math.min(siblings.indexOf(el) * 90, 450);
       const photo = el.dataset.editKind === "photo";
       const animation = el.animate([
-        { opacity: 0, transform: `translateY(${el.tagName === "FOOTER" ? 80 : 30}px)${photo ? " scale(1.05)" : ""}` },
+        { opacity: 0, transform: `translateY(30px)${photo ? " scale(1.05)" : ""}` },
         { opacity: 1, transform: "none" },
-      ], { duration: el.tagName === "FOOTER" ? 1100 : 1000, delay, easing: "cubic-bezier(.22,1,.36,1)", fill: "both" });
+      ], { duration: 1000, delay, easing: "cubic-bezier(.22,1,.36,1)", fill: "both" });
       animation.pause();
       animation.currentTime = 0;
       animation.onfinish = () => animation.cancel();
