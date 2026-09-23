@@ -15,6 +15,7 @@ export function RebuiltHero() {
   const [ready, setReady] = useState(false);
   const [menu, setMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [overTree, setOverTree] = useState(false);
   const menuRef = useRef(null);
   const drawerRef = useRef(null);
   useEffect(() => {
@@ -33,7 +34,14 @@ export function RebuiltHero() {
     return () => { active = false; window.clearTimeout(fallback); };
   }, []);
   useEffect(() => {
-    const scroll = () => setScrolled(window.scrollY > 40);
+    const tree = document.querySelector("[data-contract-tree]");
+    const scroll = () => {
+      setScrolled(window.scrollY > 40);
+      if (tree) {
+        const rect = tree.getBoundingClientRect();
+        setOverTree(rect.top < 93 && rect.bottom > 93);
+      }
+    };
     scroll();
     window.addEventListener("scroll", scroll, { passive: true });
     return () => window.removeEventListener("scroll", scroll);
@@ -54,7 +62,7 @@ export function RebuiltHero() {
     <>
       <noscript><style>{'[data-hero-ready="false"]{opacity:1!important;visibility:visible!important;}'}</style></noscript>
       {/* Keep fixed navigation outside the sticky hero's stacking context. */}
-      <header className={`${s.header} ${!scrolled && !menu ? s.dark : ""}`} data-hero-ready={ready} data-layout-scope="official-hero-v2">
+      <header className={`${s.header} ${!scrolled && !menu ? s.dark : ""} ${overTree ? s.treeHeader : ""}`} data-hero-ready={ready} data-layout-scope="official-hero-v2">
         <div className={s.headerInner}>
           <div className={s.left}>
             <button className={s.menuButton} ref={menuRef} type="button" aria-label={menu ? "Закрыть меню" : "Открыть меню"} aria-expanded={menu} aria-controls="rebuilt-menu" onClick={() => setMenu(!menu)}><span className={s.burger}><span/><span/><span/></span></button>
@@ -91,6 +99,7 @@ export function RebuiltHero() {
           <div className={s.drawerBottom}>ЕС Клиника – забота о здоровье семьи</div>
         </div>
       </dialog>
+    <div className={s.overlapShell}>
     <section className={s.screen} data-hero-ready={ready} aria-label="ЕС Клиника – Медицинский Family Office" data-hero-version="rebuilt" data-layout-scope="official-hero-v2">
       <div className={s.inner}>
         <div className={s.content}>
@@ -112,6 +121,7 @@ export function RebuiltHero() {
         </div>
       </div>
     </section>
+    </div>
     </>
   );
 }

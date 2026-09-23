@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { ComparisonReveal } from "./ui/comparison-reveal";
 import { ContractTree, ContractDetail } from "./ui/contract-tree";
-import { TreeCloseup } from "./ui/tree-closeup";
 import { ScrollEffects } from "./ui/scroll-effects";
 import { RebuiltHero } from "./ui/rebuilt-hero";
 import { ContactWidget } from "./ui/contact-widget";
@@ -138,6 +137,24 @@ const groups = [
     ],
   },
 ];
+const contractSteps = () => groups.map((group) => (
+  <ContractDetail key={group.title} title={copy[group.title]} heading={<Text n={group.title} as="span" />}>
+    <div className="services">
+      {group.items.map((ids) => (
+        <article key={ids[0]}>
+          {ids.map((n, i) => (
+            <Text
+              n={n}
+              key={n}
+              as={i === 0 && !copy[n].includes("\n") ? "h4" : "p"}
+              className={copy[n].includes("\n") ? "multiline-service" : ""}
+            />
+          ))}
+        </article>
+      ))}
+    </div>
+  </ContractDetail>
+));
 const doctors = [
   { image: "tishina", name: 55, url: "https://es-clinic.ru/doctor-tishina" },
   { image: "frolov", name: 56, url: "https://es-clinic.ru/doctor-frolov" },
@@ -303,13 +320,13 @@ export default function Home() {
           </ol>
         </section>
         <section className="section comparison" id="comparison" aria-label="Сравнение сопровождения с ЕС Клиникой и без неё">
-          <div className="section-heading">
+          <div className="intro-title">
+            <Mark />
             <Editable id="comparison-title" as="h2">Внедрить единую систему управления здоровьем</Editable>
           </div>
           <ComparisonReveal
-            beforeLabel={copy[37]} afterLabel={copy[38]}
-            before={Array.from({ length: 7 }, (_, i) => <Text key={i} n={39 + i * 2} />)}
-            after={Array.from({ length: 7 }, (_, i) => <Text key={i} n={40 + i * 2} />)}
+            before={Array.from({ length: 7 }, (_, i) => <Text key={i} n={39 + i * 2} as="span" />)}
+            after={Array.from({ length: 7 }, (_, i) => <Text key={i} n={40 + i * 2} as="span" />)}
           />
         </section>
         <section className="section team" id="team">
@@ -345,28 +362,12 @@ export default function Home() {
           </a>
         </section>
         <section className="section contract" id="contract">
-          <ContractTree heading={<><Text n={60} as="h2" /><Text n={61} className="lead" /></>}>{groups.map((group) => (
-            <ContractDetail key={group.title} title={copy[group.title]} heading={<Text n={group.title} as="span" />}>
-              <div className="services">
-                {group.items.map((ids) => (
-                  <article key={ids[0]}>
-                    {ids.map((n, i) => (
-                      <Text
-                        n={n}
-                        key={n}
-                        as={i === 0 && !copy[n].includes("\n") ? "h4" : "p"}
-                        className={
-                          copy[n].includes("\n") ? "multiline-service" : ""
-                        }
-                      />
-                    ))}
-                  </article>
-                ))}
-              </div>
-            </ContractDetail>
-          ))}</ContractTree>
+          <div className="contract-intro">
+            <Text n={60} as="h2" />
+            <Text n={61} className="lead" />
+          </div>
+          <ContractTree>{contractSteps()}</ContractTree>
         </section>
-        <TreeCloseup />
         <section className="section partners" id="partners">
           <Text n={86} as="h2" />
           <div className="partner-grid">
@@ -393,15 +394,15 @@ export default function Home() {
             <div className="stats">
               {[
                 ["20 лет", "премиальной выездной медицины"],
-                ["Тут надо", "на что-то изменить"],
+                ["300+", "экспертов"],
                 ["100+", "партнёров"],
                 ["380", "активных клиентов"],
               ].map(([n, label], i) => (
                 <div key={i}>
-                  <Editable id={i === 1 ? "stat-placeholder" : `stat-${i}`} as="strong">
+                  <Editable id={`stat-${i}`} as="strong">
                     {n}
                   </Editable>
-                  <Editable id={i === 1 ? "stat-placeholder-label" : `stat-label-${i}`}>{label}</Editable>
+                  <Editable id={`stat-label-${i}`}>{label}</Editable>
                 </div>
               ))}
             </div>

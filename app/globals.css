@@ -100,6 +100,30 @@ main {
   padding: 80px max(var(--pad), calc((100% - 1600px) / 2));
   border-bottom: 1px solid var(--line);
 }
+#contract.section {
+  padding: 0;
+  border-bottom: 0;
+}
+.contract-intro {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(34px, 3.2vw, 48px) max(var(--pad), calc((100% - 1600px) / 2));
+  background: #f0dec3;
+}
+.contract-intro::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: max(100svh, 520px);
+  background: url("/contract-tree/source-1080-v2/frame-001.webp") center / cover no-repeat;
+  transform: scaleY(-1);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 90px);
+  mask-image: linear-gradient(to bottom, #000 0, transparent 90px);
+  pointer-events: none;
+}
+.contract-intro h2 { max-width: 900px; margin-bottom: 14px; }
+.contract-intro .lead { max-width: 900px; margin: 0; }
 .split {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -111,6 +135,15 @@ main {
 }
 .split > div > img {
   margin-bottom: 35px;
+}
+#approach {
+  position: relative;
+  z-index: 1;
+  margin-top: -100svh;
+  background: var(--cream);
+}
+@media (max-width: 768px) {
+  #approach { margin-top: 0; }
 }
 .lead {
   font-size: clamp(18px, 1.25vw, 21px);
@@ -129,7 +162,7 @@ main {
   position: relative;
   aspect-ratio: 1/1;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 0;
   background: #d8ccb9;
   max-width: 100%;
 }
@@ -604,7 +637,7 @@ main {
   min-height: 0;
   margin: 40px 0 40px var(--pad);
   aspect-ratio: auto;
-  border-radius: 18px;
+  border-radius: 0;
   background: #b9a98f;
 }
 .consultation-lead-photo.photo img {
@@ -763,13 +796,9 @@ main {
   max-width: 880px;
 }
 .comparison {
-  background: #ecddc7;
+  background: var(--cream);
 }
-.comparison h2 {
-  max-width: 800px;
-  margin-inline: auto;
-  text-align: center;
-}
+#comparison .intro-title { max-width: 950px; }
 .comparison-head,
 .comparison-row {
   display: grid;
@@ -812,6 +841,7 @@ main {
 .doctors .photo {
   aspect-ratio: 4/4.4;
   margin-bottom: 25px;
+  border-radius: 18px;
 }
 .doctor-caption {
   font-size: 18px;
