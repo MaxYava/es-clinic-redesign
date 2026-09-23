@@ -1972,13 +1972,6 @@ footer {
   background: #f9f1e3;
   transition: background-color .2s ease;
 }
-.process-list > li:is(:nth-child(5), :nth-child(6), :nth-child(8)) .process-step {
-  background: #eddfca;
-  border-color: #9d795c45;
-}
-.process-list > li:is(:nth-child(5), :nth-child(6), :nth-child(8)) .process-step:is(:hover, [data-expanded="true"]) {
-  background: #e8d8bf;
-}
 .process-step > summary {
   position: relative;
   display: grid;
