@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ComparisonReveal } from "./ui/comparison-reveal";
 import { ContractTree, ContractDetail } from "./ui/contract-tree";
+import { TreeCloseup } from "./ui/tree-closeup";
 import { ScrollEffects } from "./ui/scroll-effects";
 import { RebuiltHero } from "./ui/rebuilt-hero";
 import { ContactWidget } from "./ui/contact-widget";
@@ -14,7 +15,7 @@ import {
   EditablePhoto,
   EditorLauncher,
 } from "./ui/editor";
-import { VideoCard, ContactButton, ConsultationLeadForm, ReviewsCarousel, SiteHeader, ProcessStep } from "./ui/interactive";
+import { VideoCard, ContactButton, ConsultationLeadForm, ReviewDetails, SiteHeader, ProcessStep } from "./ui/interactive";
 
 const Text = ({ n, as = "p", className = "" }) => (
   <Editable id={`copy-${n}`} as={as} className={className}>
@@ -365,6 +366,7 @@ export default function Home() {
             </ContractDetail>
           ))}</ContractTree>
         </section>
+        <TreeCloseup />
         <section className="section partners" id="partners">
           <Text n={86} as="h2" />
           <div className="partner-grid">
@@ -417,7 +419,7 @@ export default function Home() {
             <Mark />
             <Text n={92} as="h2" />
           </div>
-          <ReviewsCarousel>
+          <div className="reviews-grid">
             <article className="review-card">
               <div className="review-author">
               <div className="review-author-title">
@@ -427,11 +429,11 @@ export default function Home() {
               </div>
               <blockquote>
               <Text n={95} className="lead" />
-              <ProcessStep variant="review" heading="Читать отзыв полностью">
+              <ReviewDetails>
                 {[96, 97, 98].map((n) => (
                   <Text n={n} key={n} />
                 ))}
-              </ProcessStep>
+              </ReviewDetails>
               </blockquote>
             </article>
             <article className="review-card">
@@ -443,42 +445,14 @@ export default function Home() {
               </div>
               <blockquote>
               <Editable id="review-shumov-intro" className="lead">«Я правда уже не представляю свою жизнь без ЕС Клиники.</Editable>
-              <ProcessStep variant="review" heading="Читать отзыв полностью">
+              <ReviewDetails>
                 <Editable id="review-shumov-1">Особенно это почувствовал в ситуации с одной премиальной Клиникой: возникла задержка, но команда ЕС быстро подключилась и помогла всё решить. И в какой-то момент я поймал себя на мысли: «Как вообще я раньше жил без вас?»</Editable>
                 <Editable id="review-shumov-2">За последнее время было уже много таких ситуаций – от организации взаимодействия с другими клиниками до вопросов с лекарствами. Мне очень нравится, что я могу просто передать задачу команде и знать, что её доведут до результата.</Editable>
                 <Editable id="review-shumov-3">Огромное спасибо за вашу работу и за то, сколько медицинских вопросов вы снимаете с меня»</Editable>
-              </ProcessStep>
+              </ReviewDetails>
               </blockquote>
             </article>
-            <article className="review-card">
-              <div className="review-author">
-                <div className="review-author-title">
-                  <Editable id="review-krasnova-name" as="h3">Алёна Краснова</Editable>
-                </div>
-                <Editable id="review-krasnova-role">Блогер</Editable>
-              </div>
-              <blockquote>
-                <Editable id="review-krasnova-intro" className="lead">«Сначала лечили меня, а теперь моих детей»</Editable>
-                <ProcessStep variant="review" heading="Читать отзыв полностью">
-                  <Editable id="review-krasnova-body">Хочу сказать большое спасибо моему любимому доктору Волковой Галине Анатольевне. Мы вместе уже 25 лет! Вы меня лечили и выхаживали, а сейчас являетесь семейным доктором у моих крошек-близнецов. Благодаря вашей заботе, вниманию и чуткому отношению наши проблемы, неуверенность и страх развеялись. Спасибо, что вы с нами! Нам с вами спокойно.</Editable>
-                </ProcessStep>
-              </blockquote>
-            </article>
-            <article className="review-card">
-              <div className="review-author">
-                <div className="review-author-title">
-                  <Editable id="review-demidova-name" as="h3">Наталья Демидова</Editable>
-                </div>
-                <Editable id="review-demidova-role">HR-директор международной компании</Editable>
-              </div>
-              <blockquote>
-                <Editable id="review-demidova-intro" className="lead">«Когда нет времени болеть — нужна медицина, которая работает на тебя»</Editable>
-                <ProcessStep variant="review" heading="Читать отзыв полностью">
-                  <Editable id="review-demidova-body">Я часто в командировках, и мне важно быть уверенной, что мои близкие под контролем. После серьёзного приступа у мамы врач подобрала новую схему лечения, наладила давление и режим — теперь всё стабильно. А мне самой провели чекап прямо дома. Это не просто клиника — это забота, которая всегда рядом.</Editable>
-                </ProcessStep>
-              </blockquote>
-            </article>
-          </ReviewsCarousel>
+          </div>
         </section>
         <section className="section faq" id="faq">
           <Text n={99} as="h2" />

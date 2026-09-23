@@ -1,6 +1,5 @@
 "use client";
-import { Children, useRef, useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { useId, useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { Editable } from "./editor";
 
@@ -9,29 +8,7 @@ export function ProcessStep({ heading, children, variant = "process" }) {
   const contentRef = useRef(null);
   const animationRef = useRef(null);
   const targetOpen = useRef(false);
-  const reviewTriggerRef = useRef(null);
-  const reviewDialogRef = useRef(null);
-  const [reviewOpen, setReviewOpen] = useState(false);
-  const [reviewMeta, setReviewMeta] = useState({ name: "", role: "", intro: "" });
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   useEffect(() => () => animationRef.current?.cancel(), []);
-  useEffect(() => {
-    if (variant !== "review" || !reviewOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.body.classList.add("review-modal-open");
-    const close = (event) => {
-      if (event.key === "Escape") setReviewOpen(false);
-    };
-    window.addEventListener("keydown", close);
-    requestAnimationFrame(() => reviewDialogRef.current?.focus());
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.classList.remove("review-modal-open");
-      window.removeEventListener("keydown", close);
-    };
-  }, [reviewOpen, variant]);
   const toggle = (event) => {
     event.preventDefault();
     const details = detailsRef.current;
@@ -59,42 +36,6 @@ export function ProcessStep({ heading, children, variant = "process" }) {
       animationRef.current = null;
     };
   };
-  const openReview = () => {
-    const card = reviewTriggerRef.current?.closest(".review-card");
-    setReviewMeta({
-      name: card?.querySelector("h3")?.textContent?.trim() || "",
-      role: card?.querySelector(".review-author > p")?.textContent?.trim() || "",
-      intro: card?.querySelector("blockquote > .lead")?.textContent?.trim() || "",
-    });
-    setReviewOpen(true);
-  };
-  if (variant === "review") {
-    return (
-      <>
-        <button className="review-open" type="button" ref={reviewTriggerRef} onClick={openReview}>
-          <span>{heading}</span>
-          <span className="review-open-icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M7 2v10M2 7h10" /></svg></span>
-        </button>
-        {mounted && reviewOpen && createPortal(
-          <div className="review-modal" onMouseDown={(event) => { if (event.target === event.currentTarget) setReviewOpen(false); }}>
-            <section className="review-modal-panel" role="dialog" aria-modal="true" aria-label="Полный текст отзыва" ref={reviewDialogRef} tabIndex={-1}>
-              <button className="review-modal-close" type="button" aria-label="Закрыть отзыв" onClick={() => setReviewOpen(false)}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M3 3l12 12M15 3 3 15" /></svg>
-              </button>
-              <div className="review-modal-label">Отзыв полностью</div>
-              <div className="review-modal-head">
-                <h3>{reviewMeta.name}</h3>
-                <p>{reviewMeta.role}</p>
-              </div>
-              <blockquote className="review-modal-intro">{reviewMeta.intro}</blockquote>
-              <div className="review-modal-copy">{children}</div>
-            </section>
-          </div>,
-          document.body,
-        )}
-      </>
-    );
-  }
   return (
     <details className={`${variant}-step`} ref={detailsRef}>
       <summary onClick={toggle}>
@@ -106,94 +47,25 @@ export function ProcessStep({ heading, children, variant = "process" }) {
   );
 }
 
-export function ReviewsCarousel({ children }) {
-  const items = Children.toArray(children);
-  const viewportRef = useRef(null);
-  const interaction = useRef({ pointer: null, moved: false, suppressClick: false, lastX: 0, startX: 0, position: 0, resumeAt: 0 });
-
-  // Keep a floating-point position and wrap every movement, including a drag.
-  // A drag never depends on a stale scroll origin from before the loop seam.
-  const move = (distance) => {
-    const viewport = viewportRef.current;
-    const cycle = viewport?.firstElementChild?.firstElementChild?.getBoundingClientRect().width;
-    if (!cycle) return;
-    const state = interaction.current;
-    state.position = ((state.position + distance) % cycle + cycle) % cycle;
-    viewport.scrollLeft = state.position;
-  };
-
-  useEffect(() => {
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let frame = 0;
-    let previous = performance.now();
-    const tick = (now) => {
-      const state = interaction.current;
-      if (!motion.matches && state.pointer === null && now >= state.resumeAt && !document.hidden && !document.body.classList.contains("review-modal-open")) {
-        const ramp = state.resumeAt ? Math.min(1, (now - state.resumeAt) / 1200) : 1;
-        const speed = ramp * ramp * (3 - 2 * ramp);
-        move(Math.min(now - previous, 40) * .035 * speed);
-      }
-      previous = now;
-      frame = requestAnimationFrame(tick);
-    };
-    const resize = new ResizeObserver(() => move(0));
-    resize.observe(viewportRef.current);
-    frame = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(frame); resize.disconnect(); };
-  }, []);
-
-  const pointerDown = (event) => {
-    if (!event.isPrimary || event.button !== 0) return;
-    const state = interaction.current;
-    state.pointer = event.pointerId;
-    state.moved = false;
-    state.suppressClick = false;
-    state.lastX = state.startX = event.clientX;
-  };
-  const pointerMove = (event) => {
-    const state = interaction.current;
-    if (state.pointer !== event.pointerId) return;
-    if (!state.moved && Math.abs(event.clientX - state.startX) < 5) return;
-    state.moved = true;
-    state.suppressClick = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    event.currentTarget.dataset.dragging = "true";
-    move(state.lastX - event.clientX);
-    state.lastX = event.clientX;
-    event.preventDefault();
-  };
-  const pointerUp = (event) => {
-    const state = interaction.current;
-    if (state.pointer !== event.pointerId) return;
-    state.pointer = null;
-    if (state.moved) state.resumeAt = performance.now() + 2000;
-    delete event.currentTarget.dataset.dragging;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-  };
+export function ReviewDetails({ children }) {
+  const [open, setOpen] = useState(false);
+  const contentId = useId();
 
   return (
-    <div
-      className="reviews-carousel"
-      aria-label="Отзывы клиентов"
-      ref={viewportRef}
-      onPointerDown={pointerDown}
-      onPointerMove={pointerMove}
-      onPointerUp={pointerUp}
-      onPointerCancel={pointerUp}
-      onLostPointerCapture={pointerUp}
-      onPointerLeave={event => { if (!interaction.current.moved) pointerUp(event); }}
-      onDragStart={event => event.preventDefault()}
-      onWheel={event => { if (event.deltaX || event.shiftKey) move(event.deltaX || event.deltaY); }}
-      onClickCapture={(event) => {
-        if (!interaction.current.suppressClick) return;
-        event.preventDefault();
-        event.stopPropagation();
-        interaction.current.suppressClick = false;
-      }}
-    >
-      <div className="reviews-track">
-        <div className="reviews-group">{items}</div>
-        <div className="reviews-group reviews-group-copy">{items}</div>
+    <div className="review-details" data-expanded={open}>
+      <button className="review-toggle" type="button" aria-expanded={open} aria-controls={contentId}
+        aria-label={open ? "Свернуть отзыв" : "Читать отзыв полностью"}
+        onClick={() => setOpen(!open)}>
+        <span className="review-toggle-label" aria-hidden="true">
+          <span className="review-read">Читать отзыв полностью</span>
+          <span className="review-close">Свернуть отзыв</span>
+        </span>
+        <span className="review-expand" aria-hidden="true">+</span>
+      </button>
+      <div className="review-details-content" id={contentId} aria-hidden={!open} inert={!open}>
+        <div className="review-details-content-inner">
+          <div className="review-details-copy">{children}</div>
+        </div>
       </div>
     </div>
   );

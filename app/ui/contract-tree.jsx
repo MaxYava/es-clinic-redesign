@@ -3,7 +3,7 @@
 import { Children, useEffect, useRef, useId } from "react";
 import styles from "./contract-tree.module.css";
 
-const frameUrl = index => `/contract-tree/cropped/frame-${String(index + 1).padStart(3, "0")}.webp`;
+const frameUrl = index => `/contract-tree/new-tree-clean/frame-${String(index + 1).padStart(3, "0")}.webp`;
 
 export function ContractDetail({ heading, title, children }) {
   const dialog = useRef(null);
@@ -55,7 +55,8 @@ export function ContractTree({ children, heading }) {
       while (nearest >= 0 && !frames[nearest]?.complete) nearest--;
       const frame = frames[nearest];
       if (frame?.naturalWidth && drawn !== nearest) {
-        context.drawImage(frame, 0, 0, 540, 780);
+        context.clearRect(0, 0, 660, 550);
+        context.drawImage(frame, 0, 0, 660, 550);
         canvas.current.parentElement.dataset.ready = "true";
         drawn = nearest;
       }
@@ -121,8 +122,8 @@ export function ContractTree({ children, heading }) {
       <div className={styles.heading}>{heading}</div>
       <div className={styles.scene}>
       <div className={styles.tree} aria-hidden="true">
-        <img src={frameUrl(0)} alt="" loading="lazy" width="540" height="780" />
-        <canvas ref={canvas} width="540" height="780" />
+        <img src={frameUrl(0)} alt="" loading="lazy" width="660" height="550" />
+        <canvas ref={canvas} width="660" height="550" />
       </div>
       {Children.map(children, (child, index) => <div className={`${styles.card} ${styles[`card${index}`]}`} data-visible="false" inert>
         {child}

@@ -4,8 +4,8 @@
 .heading h2 { margin-bottom: 18px; }
 .heading :global(.lead) { max-width: 1100px; margin: 0; font-size: clamp(16px, 1.35vw, 23px); }
 .scene { position: relative; flex: 1; min-height: 0; }
-.tree { position: absolute; inset: 0 0 32px; overflow: hidden; display: flex; justify-content: center; pointer-events: none; mix-blend-mode: multiply; mask-image: linear-gradient(transparent, #000 2%, #000 98%, transparent); }
-.tree img, .tree canvas { position: absolute; top: 0; height: 100%; width: auto; max-width: 100%; object-fit: contain; filter: brightness(1.09); mask-image: linear-gradient(90deg, transparent, #000 2%, #000 98%, transparent); }
+.tree { position: absolute; inset: 0 0 32px; overflow: hidden; display: flex; justify-content: center; pointer-events: none; mask-image: linear-gradient(transparent, #000 2%, #000 98%, transparent); }
+.tree img, .tree canvas { position: absolute; top: 0; height: 100%; width: auto; max-width: 50%; object-fit: contain; }
 .tree[data-ready="true"] img { display: none; }
 .card { position: absolute; width: 31%; z-index: 1; }
 .card[data-visible="false"] { opacity: 0; pointer-events: none; }
@@ -27,6 +27,7 @@
 @media (max-width: 760px) {
   .journey { height: calc(400svh + 95px); }
   .tree { top: 0; bottom: 30px; }
+  .tree img, .tree canvas { max-width: 100%; }
   .heading h2 { font-size: 25px; margin-bottom: 10px; }
   .heading :global(.lead) { font-size: 14px; }
   .card { width: 76%; }
