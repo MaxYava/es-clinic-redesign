@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ScrollComparisonReveal } from "../ui/comparison-scroll";
-import { ContractTree, ContractDetail } from "../ui/contract-tree";
+import { ContractScrollStory } from "../ui/contract-scroll-story";
 import { ScrollEffects } from "../ui/scroll-effects";
 import { RebuiltHero } from "../ui/rebuilt-hero";
 import { ContactWidget } from "../ui/contact-widget";
@@ -118,43 +118,6 @@ const stages = [
   [32, 33],
   [34, 35],
 ];
-const groups = [
-  { title: 62, items: [[63, 64, 65], [66], [67], [68], [69, 70]] },
-  {
-    title: 71,
-    items: [
-      [72, 73],
-      [74, 75],
-      [76, 77],
-      [78, 79],
-    ],
-  },
-  {
-    title: 80,
-    items: [
-      [81, 82, 83],
-      [84, 85],
-    ],
-  },
-];
-const contractSteps = () => groups.map((group) => (
-  <ContractDetail key={group.title} title={copy[group.title]} heading={<Text n={group.title} as="span" />}>
-    <div className="services">
-      {group.items.map((ids) => (
-        <article key={ids[0]}>
-          {ids.map((n, i) => (
-            <Text
-              n={n}
-              key={n}
-              as={i === 0 && !copy[n].includes("\n") ? "h4" : "p"}
-              className={copy[n].includes("\n") ? "multiline-service" : ""}
-            />
-          ))}
-        </article>
-      ))}
-    </div>
-  </ContractDetail>
-));
 const doctors = [
   { image: "tishina", name: 55, url: "https://es-clinic.ru/doctor-tishina" },
   { image: "frolov", name: 56, url: "https://es-clinic.ru/doctor-frolov" },
@@ -364,12 +327,12 @@ export default function ScrollVersionPage() {
           </a>
         </section>
         <section className="section contract" id="contract">
-          <ContractTree intro={(
+          <ContractScrollStory intro={(
             <div className="contract-intro">
               <Text n={60} as="h2" />
               <Text n={61} className="lead" />
             </div>
-          )}>{contractSteps()}</ContractTree>
+          )} />
         </section>
         <section className="section partners" id="partners">
           <Text n={86} as="h2" />
