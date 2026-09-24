@@ -13,8 +13,8 @@
 /public/assets/tree-storyboard-v2/
 /public/assets/tree-video-anchors/
 
-# Earlier tree iterations. The active 1080p source, desktop/mobile packs,
-# and worker remain available to the production experience.
+# Earlier tree iterations. The active 1080p source is kept for comparison
+# in the deployed video lab; desktop/mobile packs and worker remain available.
 /public/contract-tree/botanical-closeup/
 /public/contract-tree/botanical-closeup-hd/
 /public/contract-tree/cropped/
@@ -31,7 +31,6 @@
 /public/contract-tree/packed-full/
 /public/contract-tree/packed-1080-v2-fast/
 /public/contract-tree/packed-1080-v2-mobile-fast/
-/public/contract-tree/tree-growth-1080.mp4
 /public/contract-tree/tree-growth-test-av1.webm
 /public/contract-tree/source-quality/
 /public/contract-tree/sprout-to-tree/

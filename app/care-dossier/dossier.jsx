@@ -134,7 +134,7 @@ export default function CareDossier() {
 
   function goTo(target) {
     if (turn || target === spread || target < 0 || target > situations.length) return;
-    if (window.matchMedia("(max-width: 1100px), (prefers-reduced-motion: reduce)").matches) {
+    if (window.matchMedia("(max-width: 760px), (prefers-reduced-motion: reduce)").matches) {
       setSpread(target);
       return;
     }
@@ -156,7 +156,7 @@ export default function CareDossier() {
       gesture.current = event.clientX;
       return;
     }
-    if (event.button !== 0 || turn || window.matchMedia("(max-width: 1100px), (prefers-reduced-motion: reduce)").matches) return;
+    if (event.button !== 0 || turn || window.matchMedia("(max-width: 760px), (prefers-reduced-motion: reduce)").matches) return;
     const bounds = bookPages.current?.getBoundingClientRect();
     if (!bounds || event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) return;
     const direction = event.clientX >= bounds.left + bounds.width / 2 ? "forward" : "backward";

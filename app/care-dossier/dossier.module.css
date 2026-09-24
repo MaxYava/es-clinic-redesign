@@ -9,13 +9,13 @@
 .intro h1 { max-width: 1080px; margin: 17px 0 22px; font: 400 clamp(42px, 5.2vw, 79px)/1.04 var(--font-germes), serif; letter-spacing: -.035em; }
 .intro > p:last-child { max-width: 760px; color: #806c59; font-size: clamp(17px, 1.3vw, 20px); line-height: 1.48; }
 .index { display: flex; gap: 1px; min-width: 0; overflow-x: auto; margin-bottom: 21px; scrollbar-width: thin; border-bottom: 1px solid #c9b59e; }
-.index button { display: grid; align-content: center; gap: 6px; flex: 1 0 130px; min-height: 81px; padding: 10px 12px 15px; border: 0; border-top: 1px solid #c9b59e; background: transparent; color: #917c69; text-align: left; transition: background .3s, color .3s, border-color .3s; }
+.index button { display: grid; align-content: center; flex: 1 0 130px; min-height: 67px; padding: 10px 12px; border: 0; border-top: 1px solid #c9b59e; background: transparent; color: #917c69; text-align: left; transition: background .3s, color .3s, border-color .3s; }
 .index button:first-child { flex-basis: 115px; }
 .index button:hover, .index .activeIndex { border-top: 3px solid #9e7454; padding-top: 8px; background: #f5e7d4; color: #533e2d; }
 .index button:disabled { opacity: .72; cursor: wait; }
-.index span { color: #aa886d; font-size: 11px; }
 .index strong { font: 400 clamp(14px, 1.15vw, 17px)/1.13 var(--font-germes), serif; }
-.bookScene { position: relative; width: 100%; aspect-ratio: 1.8; overflow: hidden; border-radius: 9px; background: #dfd0ba; box-shadow: 0 28px 70px #59412b24; touch-action: pan-y; }
+.bookScene { position: relative; width: 100%; aspect-ratio: 1.8; overflow: hidden; border-radius: 9px; background: #dfd0ba; box-shadow: 0 28px 70px #59412b24; touch-action: pan-y; cursor: grab; user-select: none; }
+.bookScene.dragging { cursor: grabbing; }
 .bookPhoto { object-fit: cover; pointer-events: none; user-select: none; }
 .bookPages { position: absolute; top: 9.1%; bottom: 13%; left: 6%; right: 6%; display: grid; grid-template-columns: 1fr 1fr; perspective: 1900px; transform-style: preserve-3d; }
 .pageSheet { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: #fff9ef8a; }
@@ -27,25 +27,25 @@
 .rightContent { padding-left: clamp(25px, 3.15vw, 53px); }
 .pageHeader { display: flex; justify-content: space-between; align-items: center; flex: none; min-height: 27px; padding-bottom: 10px; border-bottom: 1px solid #bda88e; color: #8f735b; font-size: clamp(9px, .82vw, 13px); letter-spacing: .11em; white-space: nowrap; }
 .pageHeader img { width: clamp(14px, 1.2vw, 19px); height: auto; opacity: .82; }
-.overviewIntro { display: flex; align-items: center; gap: 13px; flex: none; min-height: clamp(53px, 5.15vw, 80px); }
-.overviewNumber { color: #ad9276; font: 400 clamp(30px, 3.4vw, 52px)/1 var(--font-germes), serif; }
-.overviewIntro h2 { margin: 0; font: 400 clamp(21px, 2.4vw, 37px)/1 var(--font-germes), serif; letter-spacing: -.02em; }
-.comparisonList { display: grid; flex: 1; grid-template-rows: repeat(7, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-top: 1px solid #d6c6b0; }
-.comparisonList li { display: grid; grid-template-columns: clamp(23px, 2.5vw, 38px) minmax(0, 1fr); gap: clamp(5px, .6vw, 9px); align-items: center; min-height: 0; padding: 2px 0; border-bottom: 1px solid #d6c6b0; font-size: clamp(11px, .93vw, 14px); line-height: 1.23; }
+.comparisonList { display: grid; flex: 1; grid-template-rows: repeat(7, minmax(0, 1fr)); margin: clamp(14px, 1.7vw, 26px) 0 0; padding: 0; list-style: none; border-top: 1px solid #d6c6b0; }
+.comparisonList li { display: flex; align-items: center; min-height: 0; padding: 3px 0; border-bottom: 1px solid #d6c6b0; font-size: clamp(11px, .98vw, 15px); line-height: 1.27; }
 .leftContent .comparisonList { color: #746658; }
 .rightContent .comparisonList { color: #503f30; }
-.listNumber { align-self: center; color: #a68a70; font: 400 clamp(14px, 1.35vw, 20px)/1 var(--font-germes), serif; }
-.rightContent .listNumber { color: #82916f; }
-.detailTop { display: flex; justify-content: space-between; gap: 12px; padding-top: clamp(19px, 2.1vw, 35px); color: #a68b70; font-size: clamp(9px, .8vw, 12px); letter-spacing: .07em; }
-.detailBody { display: flex; flex-direction: column; justify-content: center; flex: 1; padding-bottom: 5%; }
-.detailNumber { display: block; margin-bottom: 5px; color: #ae987d; font: 400 clamp(60px, 7.7vw, 117px)/.9 var(--font-germes), serif; }
-.rightContent .detailNumber { color: #9dad8a; }
+.detailTop { display: flex; gap: 12px; padding-top: clamp(17px, 2vw, 31px); color: #a68b70; font-size: clamp(9px, .8vw, 12px); letter-spacing: .07em; }
+.detailBody { display: flex; flex-direction: column; justify-content: flex-start; flex: 1; padding-top: clamp(32px, 4.2vw, 70px); padding-bottom: 5%; }
 .detailBody h2 { max-width: 580px; margin: 0; font: 400 clamp(27px, 3.35vw, 51px)/1.05 var(--font-germes), serif; letter-spacing: -.025em; }
 .detailRule { display: block; width: 73px; height: 1px; margin: clamp(15px, 2vw, 30px) 0; background: #a6896d; }
 .rightContent .detailRule { background: #809170; }
 .detailBody p { max-width: 590px; margin: 0; font: 400 clamp(18px, 1.8vw, 28px)/1.3 var(--font-aeroport), sans-serif; }
 .leftContent .detailBody p { color: #776a5b; }
-.detailBottom { display: flex; justify-content: space-between; gap: 12px; padding-top: 11px; border-top: 1px solid #cbb9a1; color: #968069; font-size: clamp(10px, .85vw, 13px); }
+.detailBottom { display: flex; justify-content: flex-end; gap: 12px; padding-top: 11px; border-top: 1px solid #cbb9a1; color: #968069; font-size: clamp(12px, 1vw, 15px); }
+.illustration { display: block; flex: none; align-self: center; width: min(100%, 420px); height: clamp(82px, 10vw, 140px); margin-top: auto; overflow: visible; fill: none; stroke: #a38c72; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.illustrationAfter { stroke: #7f9272; }
+.illustration .faintStroke { stroke-dasharray: 5 7; opacity: .6; }
+.illustration .finalNode { fill: #9cac8d21; }
+.illustration .drawStroke { stroke-dasharray: 700; stroke-dashoffset: 700; }
+.illustrationActive .drawStroke { animation: drawLine 1.25s .14s cubic-bezier(.2,.73,.16,1) forwards; }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
 .turningLeaf { position: absolute; z-index: 5; top: 0; width: 50%; height: 100%; transform-style: preserve-3d; will-change: transform; transition: transform 1.15s cubic-bezier(.2,.73,.16,1); }
 .turnForward { left: 50%; transform-origin: left center; transform: rotateY(0deg); }
 .turnBackward { left: 0; transform-origin: right center; transform: rotateY(0deg); }
@@ -66,11 +66,9 @@
 .pager em { font-style: normal; color: #aa8a6c; }
 @media (max-width: 1100px) {
   .index button { flex: 0 0 130px; }
-  .bookScene { aspect-ratio: auto; overflow: visible; border: 1px solid #d3bea3; border-radius: 10px; background: #eadcc7; }
-  .bookPhoto, .spine, .turningLeaf { display: none; }
-  .bookPages { position: relative; inset: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; min-height: 600px; padding: 16px; background: #dfd0ba; }
-  .pageSheet { min-height: 568px; background: #fff9ef; box-shadow: 0 10px 25px #523b2717; }
-  .pageContent { padding: 22px 21px; }
+  .bookScene { height: clamp(620px, 70vw, 760px); aspect-ratio: auto; }
+  .bookPages { top: 8%; bottom: 10%; left: 5%; right: 5%; }
+  .pageContent { padding: 21px 23px; }
   .comparisonList li { font-size: 12px; }
   .detailBody p { font-size: clamp(19px, 2vw, 24px); }
 }
@@ -83,19 +81,18 @@
   .intro { padding: 0 22px; margin-bottom: 32px; }
   .intro h1 { font-size: clamp(38px, 9vw, 56px); }
   .index { margin: 0 0 18px; padding: 0 22px; border-bottom: 0; }
-  .index button { flex-basis: 137px; min-height: 76px; border-bottom: 1px solid #c9b59e; }
-  .bookScene { border-left: 0; border-right: 0; border-radius: 0; }
-  .bookPages { grid-template-columns: 1fr; padding: 13px; gap: 12px; }
-  .pageSheet { min-height: 535px; border-radius: 4px; }
+  .index button { flex-basis: 137px; min-height: 65px; border-bottom: 1px solid #c9b59e; }
+  .bookScene { height: auto; overflow: visible; border-left: 0; border-right: 0; border-radius: 0; cursor: default; user-select: auto; }
+  .bookPhoto, .spine, .turningLeaf { display: none; }
+  .bookPages { position: relative; inset: auto; display: grid; grid-template-columns: 1fr; min-height: 0; padding: 13px; gap: 12px; background: #dfd0ba; }
+  .pageSheet { min-height: 535px; border-radius: 4px; background: #fff9ef; box-shadow: 0 10px 25px #523b2717; }
   .pageContent { padding: 19px 23px 23px; }
   .pageHeader { font-size: 10px; }
-  .overviewIntro { min-height: 60px; }
-  .overviewIntro h2 { font-size: 28px; }
-  .overviewNumber { font-size: 42px; }
-  .comparisonList li { grid-template-columns: 30px 1fr; font-size: clamp(11px, 3vw, 14px); line-height: 1.25; }
+  .comparisonList li { font-size: clamp(11px, 3vw, 14px); line-height: 1.25; }
   .detailBody h2 { font-size: clamp(33px, 8vw, 48px); }
   .detailBody p { font-size: clamp(20px, 5vw, 27px); }
-  .detailNumber { font-size: 90px; }
+  .detailBody { padding-top: 38px; }
+  .illustration { height: 105px; }
   .bookFooter { padding: 17px 22px 0; }
   .caption { display: none; }
   .pager { width: 100%; justify-content: space-between; }
@@ -108,4 +105,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .turningLeaf, .index button, .pager button { transition-duration: .01ms; }
+  .illustrationActive .drawStroke { animation: none; stroke-dashoffset: 0; }
 }

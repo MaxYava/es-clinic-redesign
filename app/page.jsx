@@ -362,11 +362,12 @@ export default function Home() {
           </a>
         </section>
         <section className="section contract" id="contract">
-          <div className="contract-intro">
-            <Text n={60} as="h2" />
-            <Text n={61} className="lead" />
-          </div>
-          <ContractTree>{contractSteps()}</ContractTree>
+          <ContractTree intro={(
+            <div className="contract-intro">
+              <Text n={60} as="h2" />
+              <Text n={61} className="lead" />
+            </div>
+          )}>{contractSteps()}</ContractTree>
         </section>
         <section className="section partners" id="partners">
           <Text n={86} as="h2" />

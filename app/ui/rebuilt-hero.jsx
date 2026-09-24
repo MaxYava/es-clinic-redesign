@@ -15,7 +15,7 @@ export function RebuiltHero() {
   const [ready, setReady] = useState(false);
   const [menu, setMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [overTree, setOverTree] = useState(false);
+  const [overScene, setOverScene] = useState(false);
   const menuRef = useRef(null);
   const drawerRef = useRef(null);
   useEffect(() => {
@@ -34,12 +34,12 @@ export function RebuiltHero() {
     return () => { active = false; window.clearTimeout(fallback); };
   }, []);
   useEffect(() => {
-    const tree = document.querySelector("[data-contract-tree]");
+    const scene = document.querySelector("[data-contract-scene]");
     const scroll = () => {
       setScrolled(window.scrollY > 40);
-      if (tree) {
-        const rect = tree.getBoundingClientRect();
-        setOverTree(rect.top < 93 && rect.bottom > 93);
+      if (scene) {
+        const rect = scene.getBoundingClientRect();
+        setOverScene(rect.top < 93 && rect.bottom > 93);
       }
     };
     scroll();
@@ -62,7 +62,7 @@ export function RebuiltHero() {
     <>
       <noscript><style>{'[data-hero-ready="false"]{opacity:1!important;visibility:visible!important;}'}</style></noscript>
       {/* Keep fixed navigation outside the sticky hero's stacking context. */}
-      <header className={`${s.header} ${!scrolled && !menu ? s.dark : ""} ${overTree ? s.treeHeader : ""}`} data-hero-ready={ready} data-layout-scope="official-hero-v2">
+      <header className={`${s.header} ${!scrolled && !menu ? s.dark : ""} ${overScene ? s.sceneHeader : ""}`} data-hero-ready={ready} data-layout-scope="official-hero-v2">
         <div className={s.headerInner}>
           <div className={s.left}>
             <button className={s.menuButton} ref={menuRef} type="button" aria-label={menu ? "Закрыть меню" : "Открыть меню"} aria-expanded={menu} aria-controls="rebuilt-menu" onClick={() => setMenu(!menu)}><span className={s.burger}><span/><span/><span/></span></button>
