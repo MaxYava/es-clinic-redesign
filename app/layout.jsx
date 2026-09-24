@@ -1,4 +1,6 @@
 import localFont from "next/font/local";
+import Script from "next/script";
+import { comparisonBootGuard } from "./ui/comparison-scroll-boot";
 import "./globals.css";
 
 const editorPreloadScript = String.raw`
@@ -77,7 +79,10 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: editorPreloadScript }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Script id="comparison-scroll-boot" strategy="beforeInteractive">{comparisonBootGuard}</Script>
+        {children}
+      </body>
     </html>
   );
 }

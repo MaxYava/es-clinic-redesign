@@ -1,0 +1,154 @@
+.scrollComparison {
+  color: #533e2d;
+  padding-bottom: max(80px, 20vh);
+}
+
+.upperScene {
+  position: relative;
+  padding-top: 18px;
+}
+
+.stickyView {
+  padding-top: 10px;
+}
+
+.stickyView > :global(.intro-title) {
+  margin-bottom: clamp(34px, 5vh, 58px);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  column-gap: 0;
+  row-gap: clamp(16px, 2vw, 28px);
+  width: 100%;
+  align-items: start;
+}
+
+.upperCards .pair { grid-column: span 2; }
+
+.lowerCards {
+  margin-top: clamp(44px, 6vh, 64px);
+  padding-bottom: 18px;
+}
+
+.lowerCards .pair:nth-child(1) { grid-column: 2 / span 2; }
+.lowerCards .pair:nth-child(2) { grid-column: 4 / span 2; }
+.lowerCards .pair:nth-child(3) { grid-column: 6 / span 2; }
+
+.pair {
+  position: relative;
+  min-width: 0;
+  padding-inline: clamp(6px, 1vw, 14px);
+  animation: card-appear .8s ease both;
+  animation-delay: calc(var(--card-index) * 70ms);
+}
+
+.stack {
+  position: relative;
+  transform: rotate(var(--pile-rotation, -1.4deg));
+  transition: transform 1.1s cubic-bezier(.22, 1, .36, 1);
+}
+
+.pair:nth-child(2n) .stack { --pile-rotation: 1.2deg; }
+.pair:nth-child(3n) .stack { --pile-rotation: -2deg; }
+.lowerCards .pair:nth-child(2) .stack { --pile-rotation: 1.2deg; }
+.pair[data-revealed="true"] .stack { transform: translateY(-7px) rotate(0deg) scale(1.01); }
+
+.beforeCard,
+.afterCard {
+  position: relative;
+  box-sizing: border-box;
+  border-radius: 22px;
+}
+
+.beforeCard {
+  width: 100%;
+  min-height: 188px;
+  padding: 20px 25px 78px;
+  border: 1px solid #dfcfba;
+  background: linear-gradient(145deg, #f2e9dce8, #dfd1bfc7);
+  box-shadow: 0 14px 34px #6b50371b, inset 0 1px #fff9;
+  -webkit-backdrop-filter: blur(14px) saturate(115%);
+  backdrop-filter: blur(14px) saturate(115%);
+}
+
+.afterCard {
+  position: relative;
+  margin-top: -68px;
+  width: 100%;
+  min-height: 188px;
+  padding: 20px 25px 27px;
+  border: 1px solid #fff8e7d9;
+  background: linear-gradient(135deg, #fffdf1ed 0%, #fff8e7df 54%, #eadbc9d9 100%);
+  box-shadow: 0 24px 54px #6b50372e, 0 2px 6px #6b503714, inset 0 1px #fff;
+  -webkit-backdrop-filter: blur(22px) saturate(132%);
+  backdrop-filter: blur(22px) saturate(132%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(132px) scale(.96);
+  transition: opacity 1.05s ease, transform 1.2s cubic-bezier(.22, 1, .36, 1), visibility 0s linear 1.2s;
+}
+
+.pair[data-revealed="true"] .afterCard {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+
+.afterCard::after {
+  content: "";
+  position: absolute;
+  right: 27px;
+  bottom: 18px;
+  width: 42px;
+  height: 1px;
+  background: #b49a7e;
+}
+
+.cardHeading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 18px;
+  color: #8b7969;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.afterCard .cardHeading { color: #987356; }
+.cardHeading img { flex: none; }
+.beforeCard p, .afterCard p { margin: 0; }
+.beforeCard p { max-width: 34ch; color: #76695d; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.32; }
+.afterCard p { max-width: 39ch; padding-right: 15px; font-size: clamp(16px, 1.18vw, 21px); line-height: 1.28; letter-spacing: -.018em; }
+
+@keyframes card-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 760px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .upperCards .pair,
+  .lowerCards .pair { grid-column: auto; padding-inline: 0; }
+  .upperCards .pair:nth-child(4) { grid-column: 1 / -1; width: calc(50% - 7px); justify-self: center; }
+  .lowerCards .pair:nth-child(3) { grid-column: 1 / -1; width: calc(50% - 7px); justify-self: center; }
+  .beforeCard, .afterCard { min-height: 188px; padding: 19px 20px 76px; }
+  .afterCard { margin-top: -64px; padding-bottom: 25px; }
+  .beforeCard p { font-size: 16px; }
+  .afterCard p { font-size: 18px; }
+}
+
+@media (max-width: 560px) {
+  .cards { grid-template-columns: 1fr; gap: 12px; }
+  .upperCards .pair:nth-child(4), .lowerCards .pair:nth-child(3) { grid-column: auto; width: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pair { animation: none; }
+  .afterCard, .pair[data-revealed="true"] .afterCard { transition: none; transform: none; }
+}
