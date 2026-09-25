@@ -2,6 +2,7 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
+  overflow-anchor: none;
   background: #6d5d4d;
 }
 
@@ -38,19 +39,22 @@
 .scene {
   position: relative;
   z-index: 1;
-  padding: max(92px, 10svh) max(var(--pad), calc((100% - 1600px) / 2)) 14svh;
+  --contract-rail-top: 220px;
+  padding: var(--contract-rail-top) max(var(--pad), calc((100% - 1600px) / 2)) 14svh;
 }
 
-.scene :global(.contract-intro) {
-  position: sticky;
-  top: 84px;
+.cardRail :global(.contract-intro) {
+  position: absolute;
+  top: calc(-1 * (var(--contract-rail-top) - 100px));
+  right: 0;
+  left: 0;
   z-index: 4;
   padding-bottom: 4px;
 }
 
 .cardRail {
   position: sticky;
-  top: 220px;
+  top: var(--contract-rail-top);
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -63,39 +67,70 @@
 
 .cardRow {
   min-width: 0;
+  height: clamp(184px, 22svh, 210px);
 }
 
+.cardRow[data-card-step="1"] { grid-column: 1; }
+.cardRow[data-card-step="2"] { grid-column: 2; }
+.cardRow[data-card-step="3"] { grid-column: 3; }
+
 .sequence {
-  min-height: 210svh;
+  min-height: 180svh;
   margin-top: -1px;
 }
 
 .sequenceStep { min-height: 70svh; }
+.journey[data-locked="true"] .scene { min-height: calc(100svh + 100px); padding-bottom: 0; }
+.journey[data-locked="true"] .sequence { display: none; }
 
 .card {
   width: 100%;
   min-width: 0;
   translate: var(--drag-x, 0px) 0;
-  opacity: var(--reveal-opacity, 0);
   transform: translate3d(var(--reveal-x, 110vw), 0, 0);
-  transition: width .6s cubic-bezier(.22, 1, .36, 1);
+  transition: width .72s cubic-bezier(.22, 1, .36, 1), transform .82s cubic-bezier(.2, .8, .2, 1);
 }
 .card[data-dragging="true"] { transition: none; }
 
-.cardRow:has(.detail[data-expanded="true"]) .card { width: 100%; }
-
-.cardRail:has(.detail[data-expanded="true"]) { z-index: 5; }
-.cardRow:has(.detail[data-expanded="true"]) {
-  position: absolute;
+.cardRail:has(.detail[data-expanded="true"]),
+.cardRail:has(.cardRow[data-closing="true"]) { z-index: 5; }
+.cardRow:has(.detail[data-expanded="true"]),
+.cardRow[data-closing="true"] {
+  position: relative;
   z-index: 5;
-  top: 0;
-  right: 0;
-  left: 0;
   transform: none;
 }
 .cardRow:has(.detail[data-expanded="true"]) .card {
-  width: min(78vw, 1160px);
-  margin: 0 auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  width: var(--expand-width, min(78vw, 1160px));
+  max-height: calc(100svh - 2 * var(--expand-inset, 24px));
+  overflow: auto;
+  overscroll-behavior: auto;
+  transform: translate3d(var(--expand-x, 0px), var(--expand-y, 0px), 0) translate(-50%, -50%);
+}
+
+.cardRow[data-closing="true"] .card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  transform: translate3d(var(--reveal-x, 0px), 0, 0);
+  transition: width .3s ease-out, transform .3s ease-out;
+}
+
+.cardRow[data-closing="true"] .detailPanel {
+  transition: grid-template-rows .27s ease-out, opacity .21s ease-out;
+}
+
+.cardRow[data-card-step="1"]:has(.detail[data-expanded="true"]) .card {
+  max-height: none;
+  overflow: visible;
 }
 
 .detail {
@@ -108,44 +143,29 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
   -webkit-backdrop-filter: blur(12px) saturate(115%) brightness(104%);
   backdrop-filter: blur(12px) saturate(115%) brightness(104%);
-  will-change: backdrop-filter;
   transition: background .5s ease, box-shadow .5s ease;
 }
 
-.detail::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(255, 247, 230, .08);
-  -webkit-backdrop-filter: blur(12px) saturate(115%) brightness(104%);
-  backdrop-filter: blur(12px) saturate(115%) brightness(104%);
-  pointer-events: none;
-}
-
-.detail > * { position: relative; z-index: 1; }
-
 .detail[data-expanded="true"] {
-  background: rgba(255, 247, 230, .34);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
+  background: rgba(255, 247, 230, .46);
+  box-shadow: 0 28px 70px rgba(28, 18, 10, .32), 0 0 0 1px rgba(255, 242, 220, .16);
 }
 
 .detailTrigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
   min-height: 112px;
-  padding: 25px 30px;
+  padding: 25px 24px;
   border: 0;
   background: transparent;
   color: #fff0d6;
   text-shadow: 0 2px 10px rgba(62, 35, 18, .62), 0 0 2px rgba(62, 35, 18, .35);
   text-align: left;
   font-family: var(--font-germes), var(--font-aeroport), Arial, sans-serif;
-  font-size: clamp(24px, 1.95vw, 33px);
+  font-size: clamp(21px, 1.7vw, 33px);
   line-height: 1.16;
   cursor: grab;
   touch-action: pan-y;
@@ -154,6 +174,7 @@
 .card[data-dragging="true"] .detailTrigger { cursor: grabbing; }
 
 .detailTrigger:focus-visible { outline: 2px solid #ffe4bb; outline-offset: -5px; }
+.detailTrigger > span:first-child { white-space: pre-line; }
 
 .detailPlus {
   position: relative;
@@ -163,7 +184,7 @@
   height: 39px;
   border: 1px solid rgba(255, 231, 197, .78);
   border-radius: 50%;
-  transition: transform .5s cubic-bezier(.22, 1, .36, 1), background .3s ease;
+  transition: transform var(--disclosure-duration) var(--disclosure-easing), background .3s ease;
 }
 
 .detailPlus::before,
@@ -185,7 +206,7 @@
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows .62s cubic-bezier(.22, 1, .36, 1), opacity .42s ease;
+  transition: grid-template-rows var(--disclosure-duration) var(--disclosure-easing), opacity .45s ease;
 }
 
 .detail[data-expanded="true"] .detailPanel { grid-template-rows: 1fr; opacity: 1; }
@@ -197,7 +218,15 @@
   border-top: 1px solid #c8a27c99;
   color: #f8e6cc;
   text-shadow: 0 1px 8px rgba(62, 35, 18, .58);
+  transform: translateY(-10px);
+  transition: transform var(--disclosure-duration) var(--disclosure-easing);
 }
+
+.detail[data-expanded="true"] .detailBody { transform: translateY(0); }
+
+.cardRow[data-closing="true"] .detail { transition: background .26s ease-out, box-shadow .26s ease-out; }
+.cardRow[data-closing="true"] .detailPlus { transition: transform .28s ease-out, background .26s ease-out; }
+.cardRow[data-closing="true"] .detailBody { transition: transform .24s ease-out; }
 
 .detailBody :global(.services) {
   display: grid;
@@ -222,29 +251,91 @@
 .detailBody :global(.services p) { margin: 0; font-size: clamp(14px, 1vw, 17px); line-height: 1.5; }
 .detailBody :global(.services p + p) { margin-top: 8px; }
 
+.cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody {
+  margin-inline: 22px;
+  padding-block: 15px 19px;
+}
+.cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 18px;
+}
+.cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services article) {
+  padding-bottom: 8px;
+}
+.cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services h4) {
+  margin-bottom: 5px;
+  font-size: clamp(17px, 1.15vw, 20px);
+}
+.cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services p) {
+  font-size: clamp(13px, .88vw, 15px);
+  line-height: 1.38;
+}
+
+@media (min-width: 761px) and (max-width: 1400px) {
+  .detailTrigger {
+    gap: 8px;
+    padding-inline: 16px;
+    font-size: clamp(20px, 1.65vw, 23px);
+    letter-spacing: -.02em;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1000px) {
+  .cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1401px) {
+  .cardRow[data-card-step="1"] .detailTrigger {
+    font-size: clamp(25px, 1.5vw, 29px);
+    letter-spacing: -.025em;
+  }
+
+  .cardRow[data-card-step="1"] .detailTrigger > span:first-child {
+    white-space: pre;
+  }
+}
+
 @media (max-width: 760px) {
   .backdrop { min-height: 0; }
   .photo img { object-position: center 48%; filter: saturate(.9) brightness(.86) sepia(.08); }
   .backdrop::after { background: linear-gradient(90deg, #4d321f60, #4d321f2b), linear-gradient(180deg, #4d321f55, transparent 52%, #4d321f36); }
-  .scene { padding: 86px 20px 12svh; }
-  .scene :global(.contract-intro) { position: relative; top: auto; }
+  .scene { --contract-rail-top: 0px; padding: 86px 20px 12svh; }
   .cardRail { position: relative; top: auto; grid-template-columns: 1fr; gap: 24px; min-height: 64svh; padding: 5svh 0; }
-  .sequence { min-height: 100svh; }
-  .sequenceStep { min-height: 33svh; }
-  .cardRow { min-height: 0; }
-  .card, .cardRow:has(.detail[data-expanded="true"]) .card { width: 100%; }
-  .cardRow:has(.detail[data-expanded="true"]) { position: relative; inset: auto; transform: none; }
+  .cardRail :global(.contract-intro) { position: relative; top: auto; right: auto; left: auto; grid-column: 1; }
+  .sequence { display: none; }
+  .journey[data-locked="true"] .scene { min-height: 0; padding-bottom: 12svh; }
+  .cardRow { height: 150px; }
+  .cardRow[data-card-step="1"], .cardRow[data-card-step="2"], .cardRow[data-card-step="3"] { grid-column: 1; }
+  .card { width: 100%; }
+  .cardRow:has(.detail[data-expanded="true"]) .card { width: var(--expand-width, 90vw); }
+  .cardRow[data-card-step="1"]:has(.detail[data-expanded="true"]) .card {
+    max-height: calc(100svh - 2 * var(--expand-inset, 120px));
+    overflow: auto;
+  }
   .detailTrigger { min-height: 89px; padding: 19px 20px; font-size: clamp(22px, 5.6vw, 29px); }
   .detailPlus { width: 34px; height: 34px; }
   .detailBody { margin-inline: 20px; padding: 19px 0 23px; }
   .detailBody :global(.services) { grid-template-columns: 1fr; gap: 17px; }
   .detailBody :global(.services h4) { font-size: 20px; }
   .detailBody :global(.services p) { font-size: 15px; }
+  .cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody {
+    margin-inline: 15px;
+    padding-block: 10px 13px;
+  }
+  .cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px 12px;
+  }
+  .cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services article) { padding-bottom: 6px; }
+  .cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services h4) { font-size: 15px; }
+  .cardRow[data-card-step="1"]:is(:has(.detail[data-expanded="true"]), [data-closing="true"]) .detailBody :global(.services p) { font-size: 12px; line-height: 1.3; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cardRow[data-visible] .card { opacity: 1; transform: none; transition: none; }
-  .detailPlus, .detailPanel { transition: none; }
+  .detailPlus, .detailPanel, .detailBody { transition: none; }
 }
 
 :global([data-editing="true"]) .cardRow[data-visible] .card { opacity: 1; transform: none; }

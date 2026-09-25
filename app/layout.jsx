@@ -74,10 +74,12 @@ export default function RootLayout({ children }) {
     <html lang="ru" className={`${aeroport.variable} ${germes.variable}`}>
       <head>
         <link rel="preload" as="image" href="/assets/original-first-screen/1d6c2900267b6b8d.png" fetchPriority="high" />
-        <script
+        <Script
           id="editor-fixed-layout-preload"
-          dangerouslySetInnerHTML={{ __html: editorPreloadScript }}
-        />
+          strategy="beforeInteractive"
+        >
+          {editorPreloadScript}
+        </Script>
       </head>
       <body>
         <Script id="comparison-scroll-boot" strategy="beforeInteractive">{comparisonBootGuard}</Script>

@@ -27,7 +27,7 @@ export function ProcessStep({ heading, children, variant = "process" }) {
     }
     const animation = content.animate(
       [{ height: `${from}px`, opacity }, { height: `${to}px`, opacity: opening ? 1 : 0 }],
-      { duration: variant === "process" ? 480 : 560, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" },
+      { duration: 650, easing: "cubic-bezier(.42, 0, .58, 1)", fill: "both" },
     );
     animationRef.current = animation;
     animation.onfinish = () => {
@@ -228,7 +228,7 @@ export function ConsultationLeadForm() {
           <label className="consultation-lead-agree">
             <input className="consultation-lead-checkbox" type="checkbox" name="agree" required />
             <span className="consultation-lead-checkmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l5 5L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
-            <span>Подтверждаю, что согласен <a href="https://es-clinic.ru/consent-data" target="_blank" rel="noopener noreferrer">с условиями использования персональных данных</a> и с <a href="https://es-clinic.ru/legal" target="_blank" rel="noopener noreferrer">пользовательским соглашением</a></span>
+          <span>Подтверждаю, что согласен <a href="/consent-data">с условиями использования персональных данных</a> и с <a href="/legal">пользовательским соглашением</a></span>
           </label>
           <button className="consultation-lead-submit" type="submit">Получить консультацию<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
         </form>

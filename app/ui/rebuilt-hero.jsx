@@ -16,6 +16,7 @@ export function RebuiltHero() {
   const [menu, setMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [overScene, setOverScene] = useState(false);
+  const [overContract, setOverContract] = useState(false);
   const menuRef = useRef(null);
   const drawerRef = useRef(null);
   useEffect(() => {
@@ -35,16 +36,25 @@ export function RebuiltHero() {
   }, []);
   useEffect(() => {
     const scene = document.querySelector("[data-contract-scene]");
+    const contract = document.querySelector("[data-contract-scroll-preview]");
     const scroll = () => {
       setScrolled(window.scrollY > 40);
       if (scene) {
         const rect = scene.getBoundingClientRect();
         setOverScene(rect.top < 93 && rect.bottom > 93);
       }
+      if (contract) {
+        const rect = contract.getBoundingClientRect();
+        setOverContract(window.matchMedia("(max-width: 760px)").matches && rect.top < 74 && rect.bottom > 0);
+      }
     };
     scroll();
     window.addEventListener("scroll", scroll, { passive: true });
-    return () => window.removeEventListener("scroll", scroll);
+    window.addEventListener("resize", scroll);
+    return () => {
+      window.removeEventListener("scroll", scroll);
+      window.removeEventListener("resize", scroll);
+    };
   }, []);
   useEffect(() => {
     const drawer = drawerRef.current;
@@ -62,7 +72,7 @@ export function RebuiltHero() {
     <>
       <noscript><style>{'[data-hero-ready="false"]{opacity:1!important;visibility:visible!important;}'}</style></noscript>
       {/* Keep fixed navigation outside the sticky hero's stacking context. */}
-      <header className={`${s.header} ${!scrolled && !menu ? s.dark : ""} ${overScene ? s.sceneHeader : ""}`} data-hero-ready={ready} data-layout-scope="official-hero-v2">
+      <header className={`${s.header} ${!scrolled && !menu ? s.dark : ""} ${overScene ? s.sceneHeader : ""} ${overContract && !menu ? s.contractHeader : ""}`} data-hero-ready={ready} data-layout-scope="official-hero-v2">
         <div className={s.headerInner}>
           <div className={s.left}>
             <button className={s.menuButton} ref={menuRef} type="button" aria-label={menu ? "Закрыть меню" : "Открыть меню"} aria-expanded={menu} aria-controls="rebuilt-menu" onClick={() => setMenu(!menu)}><span className={s.burger}><span/><span/><span/></span></button>
@@ -86,7 +96,7 @@ export function RebuiltHero() {
           <Image className={s.drawerCross} src="/assets/clover.svg" width={360} height={360} alt="" aria-hidden="true" />
           <nav className={s.drawerNav} aria-label="Разделы лендинга">
             {links.map(([id, name]) => <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{name}</a>)}
-            <a href="https://es-clinic.ru/legal" target="_blank" rel="noopener noreferrer" onClick={() => setMenu(false)}>Документы ↗</a>
+            <a href="/legal" onClick={() => setMenu(false)}>Документы ↗</a>
           </nav>
           <div className={s.drawerContacts}>
             <a className={s.drawerPhone} href="tel:+74958681857">+7 (495) 868-18-57</a>

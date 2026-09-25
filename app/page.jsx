@@ -156,9 +156,9 @@ const contractSteps = () => groups.map((group) => (
   </ContractDetail>
 ));
 const doctors = [
-  { image: "tishina", name: 55, url: "https://es-clinic.ru/doctor-tishina" },
-  { image: "frolov", name: 56, url: "https://es-clinic.ru/doctor-frolov" },
-  { image: "utin", name: 57, role: 58, url: "https://es-clinic.ru/vrachi" },
+  { image: "tishina", name: 55, url: "/doctor-tishina" },
+  { image: "frolov", name: 56, url: "/doctor-frolov" },
+  { image: "utin", name: 57, role: 58, url: "/vrachi" },
 ];
 const partnerLogoIndex = {
   "Мать и дитя": 0, "Чайка": 1, "K+31": 3,
@@ -343,8 +343,6 @@ export default function Home() {
                 {d.role && <Text n={d.role} />}
                 <a
                   href={d.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-link"
                 >
                   О враче ↗
@@ -354,9 +352,7 @@ export default function Home() {
           </div>
           <a
             className="button"
-            href="https://es-clinic.ru/vrachi"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/vrachi"
           >
             {copy[59]} ↗
           </a>
@@ -529,20 +525,20 @@ export default function Home() {
               <a href="#comparison">Для кого мы работаем</a>
               <a href="#contract">Что входит в годовой контракт</a>
               <a href="#team">Наши врачи</a>
-              <a href="https://es-clinic.ru/career" target="_blank" rel="noopener noreferrer">Карьера</a>
-              <a href="https://es-clinic.ru/partners" target="_blank" rel="noopener noreferrer">Партнёрам</a>
+              <a href="/career">Карьера</a>
+              <a href="/partners">Партнёрам</a>
             </nav>
             <section>
               <h2>Документы</h2>
-              <a href="https://es-clinic.ru/legal" target="_blank" rel="noopener noreferrer">Правовые документы</a>
-              <a href="https://es-clinic.ru/consent-data" target="_blank" rel="noopener noreferrer">Согласие на обработку персональных данных</a>
-              <a href="https://es-clinic.ru/privacy" target="_blank" rel="noopener noreferrer">Политика конфиденциальности</a>
-              <a href="https://es-clinic.ru/payment" target="_blank" rel="noopener noreferrer">Онлайн-оплата</a>
+              <a href="/legal">Правовые документы</a>
+              <a href="/consent-data">Согласие на обработку персональных данных</a>
+              <a href="/privacy">Политика конфиденциальности</a>
+              <a href="/payment">Онлайн-оплата</a>
             </section>
           </div>
           <div className="footer-bottom">
             <p>*Instagram признана экстремистской организацией, деятельность которой запрещена в РФ</p>
-            <a href="https://es-clinic.ru/" target="_blank" rel="noopener noreferrer">Версия для слабовидящих</a>
+            <a href="/">Версия для слабовидящих</a>
             <span>ООО «ЕС-КЛИНИКА»</span>
           </div>
         </footer>
