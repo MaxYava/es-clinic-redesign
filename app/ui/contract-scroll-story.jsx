@@ -10,7 +10,7 @@ const groups = [
   { title: 80, items: [[81, 82, 83], [84, 85]] },
 ];
 
-const REVEAL_STAGGER_MS = 130;
+const REVEAL_STAGGER_MS = 180;
 const REVEAL_THRESHOLD = 0.2;
 const REVEAL_ROOT_MARGIN = "0px 0px -10% 0px";
 
@@ -97,6 +97,7 @@ function ContractGroup({ group, index }) {
     >
       <div className={`${styles.panelHeading} ${styles.staticHeading}`}>
         <h3>{title}</h3>
+        <button type="button" className={styles.headingHitArea} aria-label={`${expanded ? "Свернуть" : "Развернуть"}: ${title}`} aria-expanded={expanded} aria-controls={contentId} onClick={handleToggle} />
       </div>
       <button
         type="button"
@@ -159,6 +160,7 @@ function DesktopContractPanel({ group, index }) {
     >
       <div className={`${styles.panelHeading} ${styles.staticHeading}`}>
         <h3>{title}</h3>
+        <button type="button" className={styles.headingHitArea} aria-label={`${expanded ? "Свернуть" : "Развернуть"}: ${title}`} aria-expanded={expanded} aria-controls={contentId} onClick={handleToggle} />
       </div>
       <button
         type="button"

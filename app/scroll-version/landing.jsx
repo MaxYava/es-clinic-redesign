@@ -257,9 +257,11 @@ export function ScrollVersionLanding() {
             </div>
             <Text n={17} className="lead" />
           </div>
-          <Photo
-            name="reception"
-            alt="Светлый холл и стойка ресепшена ЕС Клиники"
+          <EditablePhoto
+            id="photo-responsibility-building"
+            src="/assets/clinic-building-2006.jpeg"
+            alt="Фасад ЕС Клиники"
+            className="photo responsibility-building-photo"
           />
         </section>
 
@@ -370,7 +372,7 @@ export function ScrollVersionLanding() {
               ))}
             </div>
           </div>
-          <Photo name="history" alt="Фасад ЕС Клиники с надписью «Основана в 2006»" />
+          <Photo name="reception" alt="Светлый холл и стойка ресепшена ЕС Клиники" />
         </section>
         <section className="loyalty">
           <Photo name="loyalty" alt="Семья – несколько поколений вместе" />
@@ -449,12 +451,15 @@ export function ScrollVersionLanding() {
       </main>
       <div className="footer-stage">
         <section className="prefooter-photo" aria-label="Здание ЕС Клиники">
-          <Image
-            src="/assets/official-footer-building.png"
-            alt="Фасад здания ЕС Клиники"
-            fill
-            sizes="100vw"
-          />
+          <picture>
+            <source media="(max-width: 768px)" srcSet="/assets/clinic-building-2006.jpeg" />
+            <Image
+              src="/assets/official-footer-building.png"
+              alt="Фасад здания ЕС Клиники"
+              fill
+              sizes="100vw"
+            />
+          </picture>
         </section>
         <footer id="contacts">
           <div className="footer-brand">
@@ -515,5 +520,3 @@ export function ScrollVersionLanding() {
     </EditorProvider>
   );
 }
-
-

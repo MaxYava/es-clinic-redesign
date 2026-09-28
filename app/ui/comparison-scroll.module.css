@@ -50,7 +50,7 @@
   display: grid;
   position: relative;
   transform: rotate(var(--pile-rotation, -1.4deg));
-  transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+  transition: transform .58s cubic-bezier(.22, 1, .36, 1);
 }
 
 .pair:nth-child(2n) .stack { --pile-rotation: 1.2deg; }
@@ -70,7 +70,7 @@
   z-index: 0;
   width: 100%;
   min-height: 188px;
-  padding: 20px 25px 78px;
+  padding: 20px 25px 42px;
   border: 1px solid #dfcfba;
   background: linear-gradient(145deg, #f2e9dce8, #dfd1bfc7);
   box-shadow: 0 14px 34px #6b50371b, inset 0 1px #fff9;
@@ -80,7 +80,7 @@
   z-index: 1;
   width: 100%;
   min-height: 188px;
-  padding: 20px 25px 78px;
+  padding: 20px 25px 34px;
   border: 1px solid #fff8e7d9;
   background: linear-gradient(135deg, #fffdf1 0%, #fff8e7 54%, #eadbc9 100%);
   box-shadow: 0 24px 54px #6b50372e, 0 2px 6px #6b503714, inset 0 1px #fff;
@@ -88,7 +88,7 @@
   visibility: hidden;
   pointer-events: none;
   transform: translateX(108%) scale(.97);
-  transition: opacity .48s ease, transform .58s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .58s;
+  transition: opacity .58s ease, transform .66s cubic-bezier(.22, 1, .36, 1), visibility 0s linear .66s;
 }
 
 .pair[data-revealed="true"] .afterCard {
@@ -104,7 +104,7 @@
 
   .pair[data-revealed="true"] .beforeCard,
   .pair[data-revealed="true"] .afterCard {
-    transition: transform .72s cubic-bezier(.22, 1, .36, 1);
+    transition: transform .62s cubic-bezier(.22, 1, .36, 1);
   }
 
   .pair[data-revealed="true"]:hover .stack,
@@ -114,7 +114,12 @@
 
   .pair[data-revealed="true"]:hover .beforeCard,
   .pair[data-revealed="true"]:focus-within .beforeCard {
-    transform: translateY(calc(-1 * clamp(122px, 14vh, 136px))) rotate(-.5deg) scale(.99);
+    transform: translateY(calc(-1 * clamp(138px, 14.5vh, 150px))) rotate(-.5deg) scale(.99);
+  }
+
+  .upperCards .pair:nth-child(2)[data-revealed="true"]:hover .beforeCard,
+  .upperCards .pair:nth-child(2)[data-revealed="true"]:focus-within .beforeCard {
+    transform: translateY(-176px) rotate(-.5deg) scale(.99);
   }
 
   .pair[data-revealed="true"]:hover .afterCard,
@@ -150,6 +155,7 @@
 .beforeCard p, .afterCard p { margin: 0; }
 .beforeCard p { max-width: 34ch; color: #76695d; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.32; }
 .afterCard p { max-width: 39ch; padding-right: 15px; font-size: clamp(16px, 1.18vw, 21px); line-height: 1.28; letter-spacing: -.018em; }
+.afterCard { height: max-content; min-height: 188px; }
 
 /* Mobile-only toggle. */
 .compareToggle {
@@ -196,6 +202,9 @@
 @media (max-width: 760px) {
   /* Single-column grid for both upper and lower sections. */
   .cards { grid-template-columns: minmax(0, 1fr); row-gap: 22px; }
+  .compareToggleIcon {
+    transition: transform .455s cubic-bezier(.22, 1, .36, 1), background .39s ease;
+  }
 
   /* Force every pair to full width of the single column. */
   .cards > .pair,
@@ -206,7 +215,7 @@
     padding-inline: 0;
     padding-top: 0;
     animation: none;
-    transition: padding-top .7s cubic-bezier(.22, 1, .36, 1);
+    transition: padding-top .91s cubic-bezier(.22, 1, .36, 1);
   }
 
   /* Tighter gap between the section title and the first pair. */
@@ -230,16 +239,17 @@
     grid-area: 1 / 1;
     z-index: 0;
     min-height: 148px;
-    padding: 17px 19px 62px;
-    transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+    padding: 17px 19px 28px;
+    transition: transform .59s cubic-bezier(.22, 1, .36, 1);
   }
 
   /* Reveal: the "after" card slides in from the right. */
   .cards > .pair .afterCard {
     grid-area: 1 / 1;
     z-index: 1;
-    min-height: 100%;
-    padding: 17px 19px 48px;
+    min-height: 148px;
+    height: max-content;
+    padding: 17px 19px 26px;
     border-color: #fff8e7d9;
     opacity: 0;
     visibility: hidden;
@@ -247,8 +257,8 @@
     transform: translateX(40px) scale(.98);
     transition:
       opacity .55s ease,
-      transform .7s cubic-bezier(.22, 1, .36, 1),
-      visibility 0s linear .7s;
+      transform .60s cubic-bezier(.22, 1, .36, 1),
+      visibility 0s linear .60s;
   }
   .cards > .pair[data-revealed="true"] .afterCard {
     opacity: 1;
@@ -258,13 +268,12 @@
     transition-delay: 0s;
   }
 
-  /* Comparing: "before" slides up only enough to keep the two cards
-     visually joined — the bottom ~32px stays tucked behind "after". */
+  /* Comparing: keep the revealed cards closely overlapped. */
   .cards > .pair[data-comparing="true"] {
-    padding-top: calc(var(--before-h, 180px) - 32px);
+    padding-top: calc(var(--before-h, 148px) - 18px);
   }
   .cards > .pair[data-comparing="true"] .beforeCard {
-    transform: translateY(calc(-1 * (var(--before-h, 180px) - 32px)));
+    transform: translateY(calc(-1 * (var(--before-h, 148px) - 18px)));
   }
 
   .cards > .pair .beforeCard .cardHeading,
